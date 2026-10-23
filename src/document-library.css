@@ -1,0 +1,231 @@
+.brand-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+#library-toggle {
+    font-size: 19px;
+    padding: 5px 9px;
+}
+.library-panel {
+    position: fixed;
+    z-index: 50;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    max-width: 90vw;
+    padding: 18px;
+    background: var(--surface);
+    color: var(--text);
+    border-right: 1px solid var(--border);
+    box-shadow: 6px 0 28px #091b3420;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.library-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.library-heading h2 {
+    font-size: 18px;
+}
+.library-create,
+.library-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.library-panel button {
+    font-size: 12px;
+}
+.library-root {
+    text-align: left;
+    background: var(--soft);
+}
+#library-tree {
+    flex: 1;
+    overflow: auto;
+    min-height: 70px;
+}
+#library-tree ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#library-tree ul ul {
+    padding-left: 17px;
+    border-left: 1px solid var(--border);
+    margin-left: 8px;
+}
+#library-tree ul ul > li > .library-row::before {
+    content: '';
+    position: absolute;
+    left: -17.5px;
+    top: 50%;
+    width: 40.5px;
+    height: 1px;
+    background: var(--border);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+#library-tree ul ul > li > .library-row::after {
+    content: '';
+    position: absolute;
+    left: -17.5px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--muted);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.library-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin: 2px 0;
+    min-width: 0;
+}
+.library-row.selected {
+    background: var(--soft);
+    outline: 1px solid var(--border);
+}
+.library-row.active .library-item {
+    font-weight: 650;
+    color: var(--accent);
+}
+.library-row button {
+    background: none;
+    border: 0;
+    padding: 7px 6px;
+    text-align: left;
+}
+.library-row .folder-expand {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    width: 23px;
+    background: var(--surface);
+}
+.library-row.selected .folder-expand {
+    background: var(--soft);
+}
+.library-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+.library-row[data-kind='document'] {
+    padding-left: 23px;
+}
+.library-row.drop-target,
+#library-root.drop-target {
+    outline: 2px solid var(--accent);
+}
+.library-actions button:last-child {
+    grid-column: 1/-1;
+}
+#library-selection {
+    overflow-wrap: anywhere;
+    margin: 0;
+}
+.library-panel > .help:last-child {
+    margin: 0;
+}
+.library-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #07122566;
+    z-index: 49;
+}
+.save-state {
+    font-size: 10px;
+    color: var(--muted);
+    margin: 8px 0 0;
+    overflow-wrap: anywhere;
+}
+.save-state.error,
+#library-dialog-error {
+    color: #c05e4b;
+}
+#library-dialog {
+    width: min(430px, 92vw);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    background: var(--surface);
+    color: var(--text);
+}
+#library-dialog::backdrop {
+    background: #07122577;
+}
+#library-dialog h2 {
+    font-size: 18px;
+}
+#library-dialog input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input);
+    color: var(--text);
+    font: inherit;
+}
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+#library-dialog-error {
+    font-size: 12px;
+}
+@media (min-width: 1100px) {
+    .library-open .app-header {
+        padding-left: calc(300px + clamp(12px, 1.5vw, 28px));
+    }
+    .library-open main {
+        padding-left: calc(300px + clamp(12px, 1.5vw, 28px));
+    }
+}
+@media (max-width: 1099px) {
+    .library-backdrop:not([hidden]) {
+        display: block;
+    }
+}
+@media (max-width: 740px) {
+    .save-label {
+        display: none;
+    }
+    .brand-group {
+        gap: 8px;
+    }
+}
+@media (max-width: 480px) {
+    .brand > span:not(.brand-mark) {
+        display: none;
+    }
+}
+
+.library-panel,
+#library-dialog {
+    transition:
+        background-color 800ms ease,
+        color 800ms ease,
+        border-color 800ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    .library-panel,
+    #library-dialog {
+        transition: none;
+    }
+}

@@ -1,0 +1,81 @@
+:root {
+    --editor-font: Consolas, 'Cascadia Code', 'Liberation Mono', monospace;
+    --syntax-keyword: #174ea6;
+    --syntax-string: #936122;
+    --syntax-comment: #6d7f91;
+    --syntax-number: #8250a5;
+    --syntax-name: #185e83;
+}
+:root[data-theme='dark'] {
+    --syntax-keyword: #88baff;
+    --syntax-string: #e3be8a;
+    --syntax-comment: #92a3b8;
+    --syntax-number: #c5a1ed;
+    --syntax-name: #7ed0ee;
+}
+.code-editor {
+    position: relative;
+    min-width: 0;
+    border-radius: 7px;
+    background: var(--input);
+}
+.code-editor textarea,
+.source-highlight {
+    font: 12px/1.85 var(--editor-font);
+    font-variant-ligatures: none;
+    tab-size: 2;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    letter-spacing: normal;
+}
+.code-editor textarea {
+    position: relative;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--text);
+    -webkit-text-fill-color: transparent;
+}
+.code-editor textarea::selection {
+    background: #90baff66;
+}
+.source-highlight {
+    position: absolute;
+    inset: 0;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    color: var(--text);
+}
+.source-highlight .hljs-keyword,
+.source-highlight .hljs-selector-tag,
+.source-highlight .hljs-meta,
+.source-highlight .hljs-section,
+.syntax-keyword {
+    color: var(--syntax-keyword);
+}
+.source-highlight .hljs-string,
+.source-highlight .hljs-attr,
+.source-highlight .hljs-quote,
+.syntax-string {
+    color: var(--syntax-string);
+}
+.source-highlight .hljs-comment,
+.source-highlight .hljs-code,
+.syntax-comment {
+    color: var(--syntax-comment);
+}
+.source-highlight .hljs-number,
+.source-highlight .hljs-literal,
+.syntax-number {
+    color: var(--syntax-number);
+}
+.source-highlight .hljs-attribute,
+.source-highlight .hljs-selector-class,
+.source-highlight .hljs-title,
+.source-highlight .hljs-link,
+.syntax-name {
+    color: var(--syntax-name);
+}

@@ -1,0 +1,175 @@
+.editor-modes {
+    display: flex;
+    gap: 4px;
+    margin: 14px 0 8px;
+    flex-wrap: wrap;
+}
+.editor-modes button {
+    font-size: 11px;
+    padding: 7px 12px;
+}
+.editor-modes [aria-pressed='true'] {
+    background: var(--soft);
+    color: var(--accent);
+    border-color: var(--accent);
+    font-weight: 650;
+}
+#insert-page-break {
+    margin-left: auto;
+}
+.table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--soft);
+}
+.table-controls button {
+    font-size: 10px;
+    padding: 5px 7px;
+}
+.table-controls button:disabled {
+    cursor: default;
+}
+#visual-editor {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    min-height: 420px;
+    max-height: 640px;
+    overflow: auto;
+    background: var(--surface);
+}
+#visual-editor .milkdown {
+    --crepe-color-background: var(--surface);
+    --crepe-color-on-background: var(--text);
+    --crepe-color-surface: var(--input);
+    --crepe-color-surface-low: var(--soft);
+    --crepe-color-on-surface: var(--text);
+    --crepe-color-on-surface-variant: var(--muted);
+    --crepe-color-outline: var(--muted);
+    --crepe-color-primary: var(--accent);
+    --crepe-color-secondary: var(--soft);
+    --crepe-color-on-secondary: var(--text);
+    --crepe-color-hover: var(--soft);
+    --crepe-color-selected: var(--border);
+    --crepe-color-inline-area: var(--soft);
+    --crepe-color-inline-code: var(--accent);
+    --crepe-font-default: var(--editor-font);
+    --crepe-font-title: var(--editor-font);
+    --crepe-font-code: var(--editor-font);
+    --crepe-base-font-size: 14px;
+    transition:
+        background-color 800ms ease,
+        color 800ms ease;
+}
+#visual-editor .milkdown .ProseMirror {
+    padding: 24px 30px;
+    min-height: 380px;
+    overflow-wrap: anywhere;
+}
+#visual-editor .milkdown .ProseMirror h1 {
+    font-size: 27px;
+    letter-spacing: -0.8px;
+}
+#visual-editor .milkdown .ProseMirror h2 {
+    font-size: 21px;
+}
+#visual-editor .milkdown .ProseMirror h3 {
+    font-size: 17px;
+}
+#visual-editor .markdown-marker {
+    color: var(--syntax-keyword);
+    font: inherit;
+    font-weight: 400;
+    opacity: 0.4;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#visual-editor .markdown-marker.code-fence {
+    display: block;
+    font: 12px/1.8 var(--editor-font);
+    white-space: pre-wrap;
+}
+#visual-editor .label-wrapper:has(.label.bullet),
+#visual-editor .label-wrapper:has(.label.ordered) {
+    display: none;
+}
+#visual-editor .milkdown .ProseMirror {
+    font-family: var(--editor-font);
+    font-variant-ligatures: none;
+    color: var(--text);
+    transition: color 800ms ease;
+}
+#visual-editor .milkdown .cm-editor {
+    font-family: var(--editor-font);
+    background: var(--input);
+    color: var(--text);
+}
+#visual-editor .milkdown .cm-gutters {
+    background: var(--soft);
+    color: var(--muted);
+    border-color: var(--border);
+}
+#visual-editor .milkdown .cm-content {
+    caret-color: var(--text);
+}
+#visual-editor .milkdown :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+#visual-editor .milkdown .ProseMirror:focus-visible {
+    outline: none;
+}
+#visual-editor .milkdown .milkdown-top-bar {
+    padding: 4px;
+}
+#visual-editor .preserved-html {
+    white-space: pre-wrap;
+    font:
+        10px/1.7 Consolas,
+        monospace;
+    padding: 12px;
+    margin: 14px 0;
+    background: var(--soft);
+    border: 1px dashed var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+}
+#visual-editor .manual-page-break {
+    text-align: center;
+    letter-spacing: 2px;
+    font:
+        10px/1.8 Inter,
+        'Segoe UI',
+        sans-serif;
+}
+@media (max-width: 740px) {
+    #visual-editor .milkdown .ProseMirror {
+        padding: 20px 24px;
+    }
+}
+
+/* Keep browser and ProseMirror caret coordinates in the same untransformed space. */
+#visual-editor .milkdown .ProseMirror {
+    font-size: calc(14px * var(--markdown-content-zoom, 1));
+}
+#visual-editor .milkdown .ProseMirror h1 {
+    font-size: calc(27px * var(--markdown-content-zoom, 1));
+}
+#visual-editor .milkdown .ProseMirror h2 {
+    font-size: calc(21px * var(--markdown-content-zoom, 1));
+}
+#visual-editor .milkdown .ProseMirror h3 {
+    font-size: calc(17px * var(--markdown-content-zoom, 1));
+}
+#visual-editor .milkdown .ProseMirror h4,
+#visual-editor .milkdown .ProseMirror h5,
+#visual-editor .milkdown .ProseMirror h6 {
+    font-size: 1em;
+}
+#visual-editor .milkdown .ProseMirror .cm-editor,
+#visual-editor .markdown-marker.code-fence {
+    font-size: calc(12px * var(--markdown-content-zoom, 1));
+}

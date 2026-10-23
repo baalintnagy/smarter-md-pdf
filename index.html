@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="MD-Office: edit Markdown, customize styles, and print to PDF in your browser."
+        />
+        <title>MD-Office</title>
+        <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="./styles.css" />
+        <script type="module" src="./src/app.js"></script>
+    </head>
+    <body>
+        <header class="app-header">
+            <div class="brand-group">
+                <button
+                    id="library-toggle"
+                    aria-label="Open document library"
+                    aria-expanded="false"
+                    aria-controls="library-panel"
+                >
+                    ☰</button
+                ><a class="brand" href="./" aria-label="MD-Office"
+                    ><span class="brand-mark">m↓</span><span>MD-Office</span></a
+                >
+            </div>
+            <div class="header-actions">
+                <button
+                    id="save-document"
+                    aria-label="Save document"
+                    title="Save locally (Ctrl+S / Cmd+S)"
+                >
+                    ▣ <span class="save-label">Save</span></button
+                ><button
+                    id="theme"
+                    class="theme-toggle"
+                    aria-label="Switch to dark theme"
+                    title="Switch to dark theme"
+                >
+                    <svg
+                        class="theme-moon"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z" /></svg
+                    ><svg
+                        class="theme-sun"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                            d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"
+                        />
+                    </svg></button
+                ><button id="print" class="primary" disabled>
+                    Print / Save PDF <span aria-hidden="true">↗</span>
+                </button>
+            </div>
+        </header>
+        <div id="library-backdrop" class="library-backdrop" hidden></div>
+        <aside id="library-panel" class="library-panel" aria-label="Document library" hidden>
+            <div class="library-heading">
+                <h2>Documents</h2>
+                <button id="library-close" aria-label="Close document library">×</button>
+            </div>
+            <div class="library-create">
+                <button data-library-action="new-document">+ Document</button
+                ><button data-library-action="new-folder">+ Folder</button>
+            </div>
+            <button id="library-example" type="button">Load example</button>
+            <button
+                id="library-root"
+                class="library-root"
+                title="Select root folder; drop items here to move to root"
+            >
+                ⌂ My documents
+            </button>
+            <nav id="library-tree" aria-label="Folders and documents"></nav>
+            <p id="library-selection" class="help"></p>
+            <div class="library-actions">
+                <button data-library-action="rename">Rename</button
+                ><button data-library-action="duplicate">Duplicate</button
+                ><button data-library-action="move">Move…</button
+                ><button data-library-action="delete">Delete</button
+                ><button id="export-markdown">Export .md</button>
+            </div>
+            <p class="help">
+                Saved on this browser and device. Drag items into folders to organize them.
+            </p>
+        </aside>
+        <dialog id="library-dialog" aria-labelledby="library-dialog-title">
+            <form id="library-form">
+                <h2 id="library-dialog-title"></h2>
+                <p id="library-dialog-description" class="help"></p>
+                <label id="library-name-label"
+                    >Name<input id="library-name" maxlength="160" autocomplete="off"
+                /></label>
+                <label id="library-destination-label" hidden
+                    >Destination<select id="library-destination"></select
+                ></label>
+                <p id="library-dialog-error" role="alert"></p>
+                <div class="dialog-actions">
+                    <button id="library-cancel" type="button">Cancel</button
+                    ><button id="library-submit" class="primary" type="submit">Save</button>
+                </div>
+            </form>
+        </dialog>
+        <main>
+            <section class="intro">
+                <div>
+                    <p class="eyebrow">Smarter Markdown</p>
+                    <h1>Edit Markdown. <span>Print PDF.</span></h1>
+                </div>
+            </section>
+            <div class="workspace">
+                <aside id="editor-column" class="controls">
+                    <section class="panel editor-panel">
+                        <div class="panel-heading">
+                            <h2>Markdown</h2>
+                            <label class="file-button" for="files"
+                                >↥ Open files<input
+                                    id="files"
+                                    type="file"
+                                    accept=".md,.markdown,.txt,image/*"
+                                    multiple
+                                    hidden
+                            /></label>
+                        </div>
+                        <p class="help">
+                            Paste Markdown or drop files here. Add images alongside your .md file to
+                            resolve relative paths.
+                        </p>
+                        <label class="sr-only" for="documents">Active document</label
+                        ><select id="documents" hidden></select>
+                        <div class="editor-modes" role="group" aria-label="Editing mode">
+                            <button id="mode-visual" type="button" aria-pressed="true">
+                                Visual</button
+                            ><button id="mode-markdown" type="button" aria-pressed="false">
+                                Markdown</button
+                            ><button
+                                id="insert-page-break"
+                                type="button"
+                                title="Insert a manual page break"
+                            >
+                                Page break ↵
+                            </button>
+                        </div>
+                        <p id="editor-message" class="help" role="status">Loading visual editor…</p>
+                        <div
+                            id="table-controls"
+                            class="table-controls"
+                            role="group"
+                            aria-label="Table editing"
+                            hidden
+                        >
+                            <button data-table-command="add-row" title="Add row below">+ Row</button
+                            ><button data-table-command="delete-row" title="Delete selected row">
+                                − Row
+                            </button>
+                            <button data-table-command="add-column" title="Add column after">
+                                + Column</button
+                            ><button
+                                data-table-command="delete-column"
+                                title="Delete selected column"
+                            >
+                                − Column
+                            </button>
+                            <button data-table-command="row-up" title="Move row up">Row ↑</button
+                            ><button data-table-command="row-down" title="Move row down">
+                                Row ↓</button
+                            ><button data-table-command="column-left" title="Move column left">
+                                Column ←</button
+                            ><button data-table-command="column-right" title="Move column right">
+                                Column →
+                            </button>
+                            <button data-table-command="align-left" title="Align column left">
+                                Left</button
+                            ><button data-table-command="align-center" title="Align column center">
+                                Center</button
+                            ><button data-table-command="align-right" title="Align column right">
+                                Right
+                            </button>
+                        </div>
+                        <div class="editor-label">
+                            <span id="editing-label">VISUAL EDITOR</span
+                            ><span id="word-count">0 words</span>
+                        </div>
+                        <div id="visual-editor" aria-label="Visual Markdown editor"></div>
+                        <textarea
+                            id="markdown"
+                            spellcheck="false"
+                            aria-label="Markdown source"
+                            hidden
+                        ></textarea>
+                        <div class="editor-footer">
+                            <span id="filename">untitled.md</span
+                            ><button id="sample" class="text-button">Load example</button>
+                        </div>
+                        <p id="save-state" class="save-state" role="status" aria-live="polite">
+                            Opening local library…
+                        </p>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-heading">
+                            <h2>CSS</h2>
+                            <label class="file-button" for="css-file"
+                                >↥ Import CSS<input
+                                    id="css-file"
+                                    type="file"
+                                    accept=".css,text/css"
+                                    hidden
+                            /></label>
+                        </div>
+                        <label
+                            >Document style<select
+                                id="css-template"
+                                aria-label="CSS template"
+                            ></select
+                        ></label>
+                        <label class="editor-label" for="css">DOCUMENT CSS</label
+                        ><textarea
+                            id="css"
+                            spellcheck="false"
+                            aria-label="Custom document CSS"
+                        ></textarea>
+                        <p class="help">
+                            Style <code>.document</code>, headings, tables, and more. CSS applies
+                            only inside the document preview.
+                        </p>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-heading">
+                            <h2>Page setup</h2>
+                            <span class="small-tag">mm</span>
+                        </div>
+                        <div class="two-columns">
+                            <label
+                                >Paper size<select id="preset">
+                                    <option value="A4">A4</option>
+                                    <option value="A3">A3</option>
+                                    <option value="A5">A5</option>
+                                    <option value="Letter">US Letter</option>
+                                    <option value="Legal">US Legal</option>
+                                    <option value="Tabloid">Tabloid</option>
+                                    <option value="Custom">Custom</option>
+                                </select></label
+                            ><label
+                                >Orientation<select id="orientation">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select></label
+                            >
+                        </div>
+                        <div class="three-columns">
+                            <label
+                                >Width<input
+                                    id="width"
+                                    type="number"
+                                    value="210"
+                                    min="50"
+                                    max="1000"
+                                    step="0.1"
+                                    required /></label
+                            ><label
+                                >Height<input
+                                    id="height"
+                                    type="number"
+                                    value="297"
+                                    min="50"
+                                    max="1000"
+                                    step="0.1"
+                                    required /></label
+                            ><label
+                                >Margins<input
+                                    id="margin"
+                                    type="number"
+                                    value="18"
+                                    min="0"
+                                    max="100"
+                                    step="0.5"
+                                    required
+                            /></label>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="toggle-row">
+                            <label for="smart"
+                                ><strong>Smart page breaks</strong
+                                ><span>Keep headings and content together.</span></label
+                            ><input id="smart" type="checkbox" role="switch" checked />
+                        </div>
+                        <label
+                            >Scale range<select id="scale-mode">
+                                <option value="auto">Automatic · preserve readable type</option>
+                                <option value="manual">Custom range</option>
+                            </select></label
+                        >
+                        <div class="two-columns">
+                            <label
+                                >Minimum scale (%)<input
+                                    id="min-scale"
+                                    type="number"
+                                    min="50"
+                                    max="100"
+                                    value="90"
+                                    required /></label
+                            ><label
+                                >Maximum scale (%)<input
+                                    id="max-scale"
+                                    type="number"
+                                    min="50"
+                                    max="100"
+                                    value="100"
+                                    required
+                            /></label>
+                        </div>
+                        <p class="help" id="scale-help">
+                            Calculate a readable range from your document. Edit either bound to
+                            customize. Only selected blocks shrink; headings keep their size.
+                        </p>
+                    </section>
+                </aside>
+                <div
+                    id="column-splitter"
+                    class="column-splitter"
+                    role="separator"
+                    tabindex="0"
+                    aria-label="Resize editor and preview"
+                    aria-orientation="vertical"
+                    aria-controls="editor-column preview-column"
+                    aria-valuemin="20"
+                    aria-valuemax="80"
+                    aria-valuenow="55"
+                    title="Drag to resize · Arrow keys to adjust · Double-click to reset"
+                >
+                    <span aria-hidden="true"></span>
+                </div>
+                <section
+                    id="preview-column"
+                    class="preview-panel"
+                    aria-label="Paginated document preview"
+                >
+                    <div class="preview-toolbar">
+                        <div>
+                            <span class="preview-dot"></span><strong>Print preview</strong
+                            ><span id="page-count" class="small-tag">Preparing…</span>
+                        </div>
+                        <input id="zoom" type="hidden" value="fit" />
+                    </div>
+                    <div id="status" role="status" aria-live="polite">Preparing your pages…</div>
+                    <iframe
+                        id="preview"
+                        title="Document pages"
+                        sandbox="allow-same-origin allow-modals"
+                    ></iframe>
+                    <div class="preview-footer">
+                        <span>Designed on screen. Ready for paper.</span><span>✦</span>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <footer class="app-footer"><span>© 2026 MD-Office</span></footer>
+        <noscript>This application needs JavaScript to render and paginate Markdown.</noscript>
+    </body>
+</html>
