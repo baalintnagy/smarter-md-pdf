@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+    <defs>
+        <linearGradient id="background" x2="1" y2="1">
+            <stop stop-color="#10233f" />
+            <stop offset="1" stop-color="#204b7b" />
+        </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#background)" />
+    <circle cx="1120" cy="60" r="280" fill="#72afff" opacity=".06" />
+    <g font-family="Segoe UI, Arial, sans-serif">
+        <rect x="64" y="58" width="52" height="52" rx="13" fill="#3266a8" />
+        <text x="72" y="94" fill="#fff" font-size="29" font-weight="700">m↓</text>
+        <text x="132" y="95" fill="#fff" font-size="34" font-weight="650">MD-Office</text>
+        <text x="64" y="195" fill="#fff" font-size="59" font-weight="700">Markdown to polished PDF.</text>
+        <text x="66" y="244" fill="#c1d6ef" font-size="25">Visual editing. Custom CSS. Smart pagination.</text>
+        <rect x="64" y="292" width="1072" height="245" rx="14" fill="#0b1a2d" stroke="#50749b" />
+        <path d="M80 292H1120Q1136 292 1136 308V330H64V308Q64 292 80 292" fill="#233e60" />
+        <circle cx="85" cy="311" r="4" fill="#9bbce0" />
+        <circle cx="101" cy="311" r="4" fill="#9bbce0" />
+        <circle cx="117" cy="311" r="4" fill="#9bbce0" />
+        <text x="150" y="317" fill="#c1d6ef" font-size="15">Markdown</text>
+        <text x="660" y="317" fill="#c1d6ef" font-size="15">Print preview</text>
+        <path d="M610 330V537" stroke="#50749b" />
+        <g font-family="Consolas, monospace" font-size="20">
+            <text x="90" y="375" fill="#9dc9ff"># Your next great document</text>
+            <text x="90" y="413" fill="#d7e3f3">Write **clearly**.</text>
+            <text x="90" y="451" fill="#d7e3f3">- Ideas worth sharing</text>
+            <text x="90" y="486" fill="#d7e3f3">- Pages ready to print</text>
+        </g>
+        <rect x="647" y="347" width="452" height="190" rx="3" fill="#fff" />
+        <text x="675" y="385" fill="#263442" font-size="25" font-weight="700">Your next great document</text>
+        <text x="675" y="419" fill="#526170" font-size="18">Write clearly.</text>
+        <path d="M675 439H1070" stroke="#c9d1dc" />
+        <text x="686" y="469" fill="#526170" font-size="18">• Ideas worth sharing</text>
+        <text x="686" y="500" fill="#526170" font-size="18">• Pages ready to print</text>
+        <text x="64" y="585" fill="#c1d6ef" font-size="22">Free · Local-first · Runs in your browser</text>
+        <text x="1136" y="585" fill="#9bbce0" font-size="18" text-anchor="end">No account needed</text>
+    </g>
+</svg>

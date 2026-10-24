@@ -15,7 +15,7 @@ Open http://127.0.0.1:4173. Run `npm run build` to generate the static `dist/` d
 
 ## Visual editing
 
-The workspace uses the available viewport width with small outer gutters. The editor takes the larger column; drag the divider to change the editor/preview proportions. The divider also supports Left/Right arrows (Shift for larger steps), Home/End for limits, and Enter or double-click to reset. Both columns have a minimum usable width, and the preference is remembered locally. The preview automatically fits its new width without changing paper dimensions or pagination. Panels stack on mobile, with the divider hidden. The interface uses blue tones in light and dark modes.
+The desktop workspace is centered at 85% of the viewport width with small inner gutters. At viewport widths of 1000 px or less, it uses the full width. The editor takes the larger column; drag the divider to change the editor/preview proportions. The divider also supports Left/Right arrows (Shift for larger steps), Home/End for limits, and Enter or double-click to reset. Both columns have a minimum usable width, and the preference is remembered locally. The preview automatically fits its new width without changing paper dimensions or pagination. Panels stack on mobile, with the divider hidden. The interface uses blue tones in light and dark modes.
 
 The default **Visual** mode uses Milkdown/Crepe (ProseMirror), with no table-of-contents panel. Its text uses a fixed-width Consolas/Cascadia Code/monospace font stack. Headings, bold/italic/strikeout text, inline code, links, lists, quotes, and code fences show Markdown delimiter decorations. These hints are not editable source characters and do not appear in the PDF or become duplicate tokens when editing; use Markdown mode to edit the literal syntax. The formatting toolbar supports headings, bold, italic, strikeout, code, lists, tasks, links, images, blockquotes, and rules. Selecting text opens a floating formatting toolbar; `/` opens the block menu. Undo/redo and Markdown typing shortcuts are provided by the editor.
 
@@ -42,6 +42,14 @@ Paste/drop raster images into the visual editor or use its image control. Images
 ## Deploy
 
 Push this directory to a GitHub repository on `main` or `master`. In **Settings → Pages → Source**, choose **GitHub Actions**. The included workflow installs locked dependencies, runs unit checks, builds the site, runs Chromium editor/pagination/PDF integration checks, and deploys `dist/`. All asset paths are relative, including editor chunks on repository Pages URLs. Publishing is not performed by local setup.
+
+Search, Open Graph, and Twitter card metadata in `index.html` use
+`https://baalintnagy.github.io/smarter-md-pdf/` as the canonical URL. Update those URLs
+and `public/sitemap.xml` if the site moves to a custom domain. The sharing image is
+`public/social-preview.png` (1200 × 630); edit `public/social-preview.svg` and run
+`node scripts/social-preview.mjs` to regenerate it with Playwright Chromium.
+The renderer also accepts the `BROWSER_EXECUTABLE` override described below.
+The same PNG can be uploaded as the repository's social preview in GitHub settings.
 
 ## Math and diagrams
 

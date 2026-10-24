@@ -31,12 +31,12 @@ try {
         'Editor and preview proportions are swapped',
     );
     assert.ok(
-        (await page.locator('main').boundingBox()).width === 1500,
-        'Workspace uses the viewport width',
+        (await page.locator('main').boundingBox()).width === 1275,
+        'Desktop workspace uses 85% of the viewport width',
     );
     assert.ok(
-        (await page.locator('.workspace').boundingBox()).width > 1400,
-        'Reduced outer gutters provide more usable space',
+        Math.abs((await page.locator('main').boundingBox()).x - 112.5) < 1,
+        'Narrower workspace stays centered',
     );
     const splitter = page.getByRole('separator', { name: 'Resize editor and preview' });
     const handle = await splitter.boundingBox();

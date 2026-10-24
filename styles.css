@@ -162,7 +162,7 @@ button:disabled {
     background: transparent;
 }
 main {
-    width: 100%;
+    width: 85%;
     margin: auto;
     padding: 0 clamp(12px, 1.5vw, 28px);
 }
@@ -494,6 +494,9 @@ iframe {
     outline-offset: -5px;
 }
 @media (max-width: 1000px) {
+    main {
+        width: 100%;
+    }
     .local-badge {
         display: none;
     }
