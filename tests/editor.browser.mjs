@@ -349,7 +349,9 @@ try {
             );
         }
     }
-    await page.locator('#sample').click();
+    await page.locator('#library-toggle').click();
+    await page.locator('#library-example').click();
+    await page.locator('#library-close').click();
     await ready();
     await mkdir('test-results', { recursive: true });
     await page.screenshot({ path: 'test-results/visual-editor.png', fullPage: true });

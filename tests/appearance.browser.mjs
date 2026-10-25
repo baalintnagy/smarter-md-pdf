@@ -24,6 +24,13 @@ try {
     await page.goto(`http://127.0.0.1:${process.env.PORT || 4173}${process.env.SITE_BASE || ''}/`);
     await page.locator('#visual-editor[data-state=ready]').waitFor();
     await ready();
+    assert.equal(
+        await page
+            .locator('.app-header')
+            .evaluate((header) => getComputedStyle(header).backdropFilter),
+        'blur(18px)',
+        'Production CSS preserves the standard header backdrop blur',
+    );
     const editorWidth = (await page.locator('.controls').boundingBox()).width;
     const previewWidth = (await page.locator('.preview-panel').boundingBox()).width;
     assert.ok(
@@ -242,7 +249,9 @@ try {
     );
     await page.locator('#css-template').selectOption('grayscale');
     await ready();
-    await page.locator('#sample').click();
+    await page.locator('#library-toggle').click();
+    await page.locator('#library-example').click();
+    await page.locator('#library-close').click();
     await ready();
     await page.evaluate(() => window.scrollTo(0, 0));
     await mkdir('test-results', { recursive: true });

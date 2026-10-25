@@ -300,7 +300,6 @@ const loadExample = async () => {
     await documentLibrary.initialized;
     documentLibrary.addDocument('example.md', SAMPLE);
 };
-$('sample').addEventListener('click', loadExample);
 $('library-example').addEventListener('click', loadExample);
 async function importFiles(files) {
     importing = true;

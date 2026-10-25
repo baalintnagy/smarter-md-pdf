@@ -102,8 +102,9 @@ button:disabled {
     align-items: center;
     padding: 21px 4%;
     background: var(--header);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    /* Keep the standard declaration last so minification preserves both forms. */
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--border);
     gap: 20px;
 }
@@ -338,21 +339,6 @@ textarea {
 #css {
     height: 560px;
     min-height: 420px;
-}
-.editor-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 9px;
-    font-size: 10px;
-    color: var(--muted);
-}
-.text-button {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    color: var(--accent);
-    font-size: 10px;
 }
 .two-columns,
 .three-columns {

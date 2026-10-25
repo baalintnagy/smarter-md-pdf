@@ -157,7 +157,9 @@ try {
     await page.locator('#documents').selectOption('0');
     await ready();
     assert.equal(await preview.locator('h1').textContent(), 'Edited One');
-    await page.locator('#sample').click();
+    await page.locator('#library-toggle').click();
+    await page.locator('#library-example').click();
+    await page.locator('#library-close').click();
     await ready();
     await page.locator('#preset').selectOption('A4');
     await page.locator('#orientation').selectOption('portrait');
