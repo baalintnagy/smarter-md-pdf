@@ -18,16 +18,16 @@
 }
 :root[data-theme='dark'] {
     color-scheme: dark;
-    --bg: #161d29;
-    --surface: #1e2737;
-    --header: #161d2999;
+    --bg: #19202c;
+    --surface: #212a3a;
+    --header: #19202c99;
     --text: #d5deeb;
     --muted: #9aa9c1;
     --border: #334157;
     --accent: #9ab7e5;
-    --soft: #28364c;
-    --canvas: #111925;
-    --input: #182232;
+    --soft: #2b394f;
+    --canvas: #141c28;
+    --input: #1b2535;
 }
 * {
     box-sizing: border-box;
