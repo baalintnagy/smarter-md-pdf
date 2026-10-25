@@ -11,7 +11,9 @@ const template = (id, name, font, ink, heading, accent, tint, border) => ({
   --doc-border: ${border};
 }
 
-.document p {
+.document p,
+.document ul > li,
+.document ol > li {
   text-align: justify;
 }
 
