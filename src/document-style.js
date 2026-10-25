@@ -17,7 +17,7 @@ body { background:transparent; }
 .document blockquote p:last-child { margin-bottom:0; }
 .document ul,.document ol { padding-left:21pt; margin:8pt 0 13pt; }.document li { margin:4pt 0; }
 .document table { width:100%; border-collapse:collapse; margin:15pt 0; font-size:10pt; table-layout:fixed; }
-.document th { background:var(--doc-tint, #f3f3f3); font-weight:600; text-align:left; }.document th,.document td { border:1px solid var(--doc-border, #d9d9d9); padding:8pt 10pt; vertical-align:top; }
+.document th { background:var(--doc-tint, #f3f3f3); font-weight:600; text-align:left; }.document th,.document td { border:1px solid var(--doc-border, #d9d9d9); padding:4pt 10pt; vertical-align:top; }
 .document pre { background:var(--doc-tint, #f3f3f3); border:1px solid var(--doc-border, #d9d9d9); padding:13pt; white-space:pre-wrap; overflow-wrap:anywhere; border-radius:5px; font:9pt/1.6 Consolas,monospace; }
 .document code { font-family:Consolas,monospace; font-size:.9em; background:var(--doc-tint, #f3f3f3); padding:1px 4px; border-radius:3px; }.document pre code { padding:0; background:none; font-size:inherit; }
 .document img { max-width:100%; height:auto; }.document hr { border:0; border-top:1px solid var(--doc-border, #d9d9d9); margin:22pt 0; }
