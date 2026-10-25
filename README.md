@@ -60,6 +60,10 @@ remembered in IndexedDB; when access has expired, use **Reconnect folder**. Whil
 disconnected, the app opens the browser library and labels that storage location.
 Clearing site data forgets the connection but leaves disk files intact; select the
 folder again to reconnect.
+If the browser cannot remember the folder handle, the selected folder still opens
+and saves directly to disk for the current session. A notice explains that you must
+open it again after reloading. Check that the storage label names your local folder
+before editing; enabling the browser API alone does not switch storage.
 
 Autosave, **Save**, and **Ctrl/Cmd+S** write directly to the selected folder. Changes
 to Markdown, images, metadata, or the folder tree outside the app block the next save.

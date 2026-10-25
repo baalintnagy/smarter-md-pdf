@@ -251,6 +251,38 @@ try {
     await page.locator('#open-directory').click();
     await folderSaved();
     assert.equal(await page.locator('#markdown').inputValue(), '# Changed externally');
+    await page.locator('#browser-library').click();
+    await saved('Saved on this device');
+    assert.equal(
+        await page.getByRole('row', { name: 'Select folder Notes', exact: true }).count(),
+        0,
+    );
+    await page.evaluate(() => {
+        const put = IDBObjectStore.prototype.put;
+        IDBObjectStore.prototype.put = function (value, key) {
+            if (key === 'directory') {
+                throw new DOMException('Handle persistence unavailable', 'DataCloneError');
+            }
+            return put.call(this, value, key);
+        };
+    });
+    await page.locator('#open-directory').click();
+    await page.waitForFunction(() =>
+        document.getElementById('save-state').textContent.includes('could not remember'),
+    );
+    assert.equal(
+        await page.locator('#storage-location').textContent(),
+        'Storage: local folder “test-documents”',
+    );
+    assert.equal(
+        await page.getByRole('row', { name: 'Select folder Notes', exact: true }).count(),
+        1,
+    );
+    assert.equal(await page.locator('#markdown').inputValue(), '# Changed externally');
+    await page.locator('#mode-markdown').click();
+    await page.locator('#markdown').fill('# Saved without remembering the folder');
+    await folderSaved();
+    assert.equal(await diskFile('example.md'), '# Saved without remembering the folder');
     assert.deepEqual(errors, []);
     const unsupported = await browser.newContext();
     await unsupported.addInitScript(() => {

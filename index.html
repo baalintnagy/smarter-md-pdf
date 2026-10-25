@@ -204,11 +204,66 @@
             </div>
             <div class="library-storage">
                 <p id="storage-location" class="help">Storage: browser library</p>
-                <button id="open-directory" type="button">Open local folder…</button>
-                <button id="copy-directory" type="button">Copy library to empty folder…</button>
-                <button id="reconnect-directory" type="button" hidden>Reconnect folder</button>
-                <button id="reload-directory" type="button" hidden>Reload folder from disk</button>
-                <button id="browser-library" type="button" hidden>Use browser library</button>
+                <div class="library-storage-actions" role="group" aria-label="Storage actions">
+                    <button
+                        id="open-directory"
+                        type="button"
+                        aria-label="Open local folder"
+                        title="Open local folder…"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M3 10V6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v1M3 10h19l-3 10H3z"
+                            />
+                        </svg>
+                    </button>
+                    <button
+                        id="copy-directory"
+                        type="button"
+                        aria-label="Copy library to empty folder"
+                        title="Copy library to empty folder…"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 7V4h5l2 3h6v13H8zM4 16H3V7h2M11 13h7m-3-3 3 3-3 3" />
+                        </svg>
+                    </button>
+                    <button
+                        id="reconnect-directory"
+                        type="button"
+                        aria-label="Reconnect folder"
+                        title="Reconnect folder"
+                        hidden
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="m10 13 4-4M8 15l-1 1a3.5 3.5 0 0 1-5-5l5-5a3.5 3.5 0 0 1 5 0m0 12a3.5 3.5 0 0 0 5 0l5-5a3.5 3.5 0 0 0-5-5l-1 1"
+                            />
+                        </svg>
+                    </button>
+                    <button
+                        id="reload-directory"
+                        type="button"
+                        aria-label="Reload folder from disk"
+                        title="Reload folder from disk"
+                        hidden
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 10a8 8 0 1 0 0 5M20 4v6h-6" />
+                        </svg>
+                    </button>
+                    <button
+                        id="browser-library"
+                        type="button"
+                        aria-label="Use browser library"
+                        title="Use browser library"
+                        hidden
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="16" rx="2" />
+                            <path d="M3 9h18M7 6.5h.01M10 6.5h.01" />
+                        </svg>
+                    </button>
+                </div>
                 <p id="directory-support" class="help" hidden>
                     Enable local folder access —
                     <a id="directory-settings" target="_blank" rel="noopener noreferrer"

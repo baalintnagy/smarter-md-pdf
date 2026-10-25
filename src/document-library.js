@@ -270,11 +270,25 @@ export class DocumentLibrary {
                 await storage.save(snapshot, 0, assets);
                 Object.assign(loaded, await storage.load());
             }
-            await this.browserStorage.rememberDirectory(
-                action === 'browser' ? null : storage.handle,
-            );
+            let connectionError;
+            try {
+                await this.browserStorage.rememberDirectory(
+                    action === 'browser' ? null : storage.handle,
+                );
+            } catch (error) {
+                // Remembering a handle is optional; it must not block direct folder access.
+                connectionError = error;
+            }
             this.rememberedDirectory = action === 'browser' ? null : storage.handle;
             await this.useStorage(storage, loaded);
+            if (connectionError) {
+                this.message(
+                    action === 'browser'
+                        ? 'Using the browser library, but the previous folder connection could not be forgotten. Check the storage location after reloading.'
+                        : `Using folder “${storage.handle.name}”. This browser could not remember the connection; open the folder again after reloading.`,
+                    true,
+                );
+            }
         } catch (error) {
             if (error.name !== 'AbortError') {
                 this.message(error.message, true);
