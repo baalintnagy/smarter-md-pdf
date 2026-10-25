@@ -12,7 +12,10 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1500, height: 1100 } });
 const errors = [];
-page.on('pageerror', (error) => errors.push(error.message));
+page.on('pageerror', (error) => {
+    errors.push(error.message);
+    console.error(error.stack);
+});
 const rich = page.locator('#visual-editor .ProseMirror');
 const preview = page.frameLocator('#preview');
 const ready = () => page.waitForFunction(() => !document.getElementById('print').disabled);
@@ -75,6 +78,68 @@ try {
     await page
         .getByRole('slider', { name: 'Markdown zoom', exact: true })
         .fill(String(positionFromZoom(100, 20, 250)));
+    const beforeEdit =
+        '# Preserve this heading #\n\n' +
+        'An __unchanged__ [reference][product].\n\n' +
+        '*   Keep this list spacing\n*   And this item\n\n' +
+        Array.from({ length: 12 }, (_, index) => `Distant paragraph ${index}.\n\n`).join('');
+    const afterEdit =
+        '\n\n~~~mermaid\ngraph TD\n    A --> B\n~~~\n\n' +
+        '[product]: https://example.com/product "Original title"\n';
+    await setSource(beforeEdit + 'Edit only this paragraph.' + afterEdit);
+    const distantHeading = await rich.locator('h1 .markdown-marker').elementHandle();
+    const target = rich.locator('p').filter({ hasText: 'Edit only this paragraph.' });
+    await target.click();
+    await page.keyboard.press('End');
+    await page.keyboard.type(' Local change');
+    assert.equal(
+        await page.locator('#markdown').inputValue(),
+        beforeEdit + 'Edit only this paragraph. Local change' + afterEdit,
+        'Typing preserves distant Markdown, reference definitions and code fences exactly',
+    );
+    assert.ok(
+        await distantHeading.evaluate((node) => node.isConnected),
+        'Typing reuses untouched marker DOM',
+    );
+    await page.keyboard.press('Backspace');
+    assert.equal(
+        await page.locator('#markdown').inputValue(),
+        beforeEdit + 'Edit only this paragraph. Local chang' + afterEdit,
+        'Deleting near the caret preserves the rest of a long document',
+    );
+    await page.keyboard.press('Control+z');
+    assert.ok((await page.locator('#markdown').inputValue()).startsWith(beforeEdit));
+    assert.ok((await page.locator('#markdown').inputValue()).endsWith(afterEdit));
+    await setSource(beforeEdit + 'Edit only this paragraph.' + afterEdit);
+    await target.click();
+    await page.keyboard.press('End');
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('New paragraph');
+    assert.equal(
+        await page.locator('#markdown').inputValue(),
+        beforeEdit + 'Edit only this paragraph.\n\nNew paragraph' + afterEdit,
+        'Splitting a paragraph preserves distant source',
+    );
+    await page.keyboard.press('Home');
+    await page.keyboard.press('Backspace');
+    assert.equal(
+        await page.locator('#markdown').inputValue(),
+        beforeEdit + 'Edit only this paragraph.New paragraph' + afterEdit,
+        'Joining paragraphs preserves distant source',
+    );
+    await page.locator('#mode-markdown').click();
+    await page.locator('#markdown').fill('New source wins over a stale hidden visual edit.');
+    await target.evaluate((node) => {
+        node.textContent = 'Late update from the previous visual document';
+    });
+    await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+    );
+    assert.equal(
+        await page.locator('#markdown').inputValue(),
+        'New source wins over a stale hidden visual edit.',
+        'Hidden visual updates cannot overwrite source-mode edits',
+    );
     await setSource(original);
     await rich.locator('h1').first().click();
     await page.keyboard.press('End');

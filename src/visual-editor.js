@@ -1,5 +1,5 @@
 import { Crepe } from '@milkdown/crepe';
-import { editorViewCtx, serializerCtx } from '@milkdown/kit/core';
+import { editorViewCtx, parserCtx, remarkCtx, serializerCtx } from '@milkdown/kit/core';
 import { $prose, replaceAll, callCommand } from '@milkdown/kit/utils';
 import { Plugin } from '@milkdown/kit/prose/state';
 import { deleteRow, deleteColumn } from '@milkdown/kit/prose/tables';
@@ -15,6 +15,7 @@ import {
 import { rawHTML, PAGE_BREAK } from './raw-html.js';
 import { visualMath } from './visual-math.js';
 import { markdownMarkers } from './markdown-markers.js';
+import { preserveVisualSource } from './visual-source.js';
 import { languages } from '@codemirror/language-data';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
@@ -78,8 +79,20 @@ export class VisualEditor {
                     view: () => ({
                         update: (view, previous) => {
                             if (!this.suppressChanges && !previous.doc.eq(view.state.doc)) {
-                                this.source = ctx.get(serializerCtx)(view.state.doc);
-                                onChange(this.source);
+                                const source = preserveVisualSource(
+                                    this.source,
+                                    previous.doc,
+                                    view.state.doc,
+                                    {
+                                        parse: ctx.get(parserCtx),
+                                        blocks: ctx.get(remarkCtx).parse(this.source).children,
+                                        serialize: ctx.get(serializerCtx),
+                                    },
+                                );
+                                if (source !== this.source) {
+                                    this.source = source;
+                                    onChange(source);
+                                }
                             }
                             onTableSelection(this.tableContext(view));
                         },

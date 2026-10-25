@@ -11,7 +11,7 @@
 }
 .editor-modes button {
     font-size: 11px;
-    padding: 7px 12px;
+    padding: 5px 9px;
 }
 .editor-modes [aria-pressed='true'] {
     background: var(--soft);
@@ -41,8 +41,8 @@
 #visual-editor {
     border: 1px solid var(--border);
     border-radius: 7px;
-    min-height: 420px;
-    max-height: 640px;
+    min-height: 560px;
+    max-height: max(760px, 75vh);
     overflow: auto;
     background: var(--surface);
 }
@@ -71,7 +71,7 @@
 }
 #visual-editor .milkdown .ProseMirror {
     padding: 24px 30px;
-    min-height: 380px;
+    min-height: 520px;
     overflow-wrap: anywhere;
 }
 #visual-editor .milkdown .ProseMirror h1 {
@@ -128,7 +128,36 @@
     outline: none;
 }
 #visual-editor .milkdown .milkdown-top-bar {
+    padding: 3px;
+    min-height: 36px;
+}
+#visual-editor .milkdown .top-bar-item,
+#visual-editor .milkdown .milkdown-toolbar .toolbar-item {
+    width: 28px;
+    height: 28px;
+    margin: 2px;
     padding: 4px;
+}
+#visual-editor .milkdown .top-bar-item svg,
+#visual-editor .milkdown .milkdown-toolbar .toolbar-item svg {
+    width: 18px;
+    height: 18px;
+}
+#visual-editor .milkdown .top-bar-divider,
+#visual-editor .milkdown .milkdown-toolbar .divider {
+    height: 20px;
+    margin: 4px;
+}
+#visual-editor .milkdown .top-bar-heading-selector {
+    padding: 2px;
+}
+#visual-editor .milkdown .top-bar-heading-button {
+    height: 28px;
+    padding: 3px 6px;
+}
+#visual-editor .milkdown .top-bar-heading-label {
+    min-width: 64px;
+    font-size: 11px;
 }
 #visual-editor .preserved-html {
     white-space: pre-wrap;

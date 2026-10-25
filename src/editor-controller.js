@@ -44,6 +44,11 @@ export class EditorController {
                     onUpload: this.onUpload,
                     resolveImage: this.resolveImage,
                     onChange: (markdown) => {
+                        // A late DOM/code-block update from the hidden visual view must not
+                        // overwrite edits made in Markdown mode.
+                        if (this.mode !== 'visual') {
+                            return;
+                        }
                         this.source.value = markdown;
                         this.onChange();
                     },

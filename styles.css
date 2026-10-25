@@ -7,7 +7,7 @@
     color-scheme: light;
     --bg: #f3f6fb;
     --surface: #fff;
-    --header: #ffffffb8;
+    --header: #ffffff8c;
     --text: #25344c;
     --muted: #718198;
     --border: #dce4ef;
@@ -20,7 +20,7 @@
     color-scheme: dark;
     --bg: #161d29;
     --surface: #1e2737;
-    --header: #161d29c2;
+    --header: #161d2999;
     --text: #d5deeb;
     --muted: #9aa9c1;
     --border: #334157;
@@ -102,8 +102,8 @@ button:disabled {
     align-items: center;
     padding: 21px 4%;
     background: var(--header);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     border-bottom: 1px solid var(--border);
     gap: 20px;
 }
@@ -332,11 +332,12 @@ textarea {
     tab-size: 2;
 }
 #markdown {
-    height: 310px;
+    height: 560px;
+    min-height: 420px;
 }
 #css {
-    height: 450px;
-    min-height: 450px;
+    height: 560px;
+    min-height: 420px;
 }
 .editor-footer {
     display: flex;

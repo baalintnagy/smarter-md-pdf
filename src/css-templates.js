@@ -11,6 +11,10 @@ const template = (id, name, font, ink, heading, accent, tint, border) => ({
   --doc-border: ${border};
 }
 
+.document p {
+  text-align: justify;
+}
+
 /* Manual break: <div class="page-break"></div> */`,
 });
 export const CSS_TEMPLATES = Object.freeze([
