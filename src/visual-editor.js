@@ -13,6 +13,7 @@ import {
     setAlignCommand,
 } from '@milkdown/kit/preset/gfm';
 import { rawHTML, PAGE_BREAK } from './raw-html.js';
+import { visualMath } from './visual-math.js';
 import { markdownMarkers } from './markdown-markers.js';
 import { languages } from '@codemirror/language-data';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -25,7 +26,6 @@ import '@milkdown/crepe/theme/common/cursor.css';
 import '@milkdown/crepe/theme/common/image-block.css';
 import '@milkdown/crepe/theme/common/link-tooltip.css';
 import '@milkdown/crepe/theme/common/list-item.css';
-import '@milkdown/crepe/theme/common/placeholder.css';
 import '@milkdown/crepe/theme/common/toolbar.css';
 import '@milkdown/crepe/theme/common/table.css';
 import '@milkdown/crepe/theme/common/top-bar.css';
@@ -41,7 +41,11 @@ export class VisualEditor {
         this.crepe = new Crepe({
             root,
             defaultValue: source,
-            features: { [Crepe.Feature.TopBar]: true, [Crepe.Feature.Latex]: false },
+            features: {
+                [Crepe.Feature.TopBar]: true,
+                [Crepe.Feature.Latex]: false,
+                [Crepe.Feature.Placeholder]: false,
+            },
             featureConfigs: {
                 [Crepe.Feature.ImageBlock]: {
                     onUpload,
@@ -88,6 +92,7 @@ export class VisualEditor {
                 ctx.set(headingIdGenerator.key, (node) => 'md-content-' + generate(node));
             })
             .use(rawHTML)
+            .use(visualMath)
             .use(markdownMarkers)
             .use(changes);
     }

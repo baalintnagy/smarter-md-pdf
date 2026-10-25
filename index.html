@@ -5,18 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
             name="description"
-            content="Edit Markdown visually, customize CSS, and export polished PDFs with smart pagination. MD-Office is a free, local-first Markdown editor that runs in your browser."
+            content="Edit Markdown visually, customize CSS, and export polished PDFs with smart pagination. MD-PDF is a free, local-first Markdown editor that runs in your browser."
         />
-        <title>MD-Office — Markdown Editor &amp; PDF Export</title>
+        <title>MD-PDF — Markdown Editor &amp; PDF Export</title>
         <link rel="canonical" href="https://baalintnagy.github.io/smarter-md-pdf/" />
-        <meta name="application-name" content="MD-Office" />
+        <meta name="application-name" content="MD-PDF" />
         <meta name="theme-color" content="#3266a8" />
         <meta name="robots" content="index, follow, max-image-preview:large" />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="MD-Office" />
+        <meta property="og:site_name" content="MD-PDF" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:url" content="https://baalintnagy.github.io/smarter-md-pdf/" />
-        <meta property="og:title" content="MD-Office — Markdown Editor &amp; PDF Export" />
+        <meta property="og:title" content="MD-PDF — Markdown Editor &amp; PDF Export" />
         <meta
             property="og:description"
             content="Write visually or edit Markdown source, customize CSS, and export polished PDFs with smart pagination. Free, local-first, and built for your browser."
@@ -30,10 +30,10 @@
         <meta property="og:image:height" content="630" />
         <meta
             property="og:image:alt"
-            content="MD-Office: Markdown to polished PDF, with a Markdown source panel and a styled document preview."
+            content="MD-PDF: Markdown to polished PDF, with a Markdown source panel and a styled document preview."
         />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="MD-Office — Markdown Editor &amp; PDF Export" />
+        <meta name="twitter:title" content="MD-PDF — Markdown Editor &amp; PDF Export" />
         <meta
             name="twitter:description"
             content="Write visually or edit Markdown source, customize CSS, and export polished PDFs with smart pagination. Free, local-first, and built for your browser."
@@ -44,13 +44,13 @@
         />
         <meta
             name="twitter:image:alt"
-            content="MD-Office: Markdown to polished PDF, with a Markdown source panel and a styled document preview."
+            content="MD-PDF: Markdown to polished PDF, with a Markdown source panel and a styled document preview."
         />
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
                 "@type": "WebApplication",
-                "name": "MD-Office",
+                "name": "MD-PDF",
                 "url": "https://baalintnagy.github.io/smarter-md-pdf/",
                 "description": "A local-first Markdown editor with visual editing, custom CSS, smart pagination, and PDF export. Runs entirely in your browser.",
                 "applicationCategory": "ProductivityApplication",
@@ -75,10 +75,11 @@
                     aria-controls="library-panel"
                 >
                     ☰</button
-                ><a class="brand" href="./" aria-label="MD-Office"
-                    ><span class="brand-mark">m↓</span><span>MD-Office</span></a
+                ><a class="brand" href="./" aria-label="MD-PDF"
+                    ><span class="brand-mark">m↓</span><span>MD-PDF</span></a
                 >
             </div>
+            <span id="filename" class="header-filename" aria-live="polite">untitled.md</span>
             <div class="header-actions">
                 <button
                     id="save-document"
@@ -86,6 +87,8 @@
                     title="Save locally (Ctrl+S / Cmd+S)"
                 >
                     ▣ <span class="save-label">Save</span></button
+                ><button id="print" class="primary" disabled>
+                    Print / Save PDF <span aria-hidden="true">↗</span></button
                 ><button
                     id="theme"
                     class="theme-toggle"
@@ -121,9 +124,7 @@
                         <path
                             d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"
                         />
-                    </svg></button
-                ><button id="print" class="primary" disabled>
-                    Print / Save PDF <span aria-hidden="true">↗</span>
+                    </svg>
                 </button>
             </div>
         </header>
@@ -134,27 +135,189 @@
                 <button id="library-close" aria-label="Close document library">×</button>
             </div>
             <div class="library-create">
-                <button data-library-action="new-document">+ Document</button
-                ><button data-library-action="new-folder">+ Folder</button>
+                <button
+                    type="button"
+                    data-library-action="new-document"
+                    aria-label="New document"
+                    title="New document"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 15h8M12 11v8"
+                        />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    data-library-action="new-folder"
+                    aria-label="New folder"
+                    title="New folder"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM8 13h8M12 9v8"
+                        />
+                    </svg>
+                </button>
+                <button
+                    id="library-example"
+                    type="button"
+                    aria-label="Load example"
+                    title="Load example"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 12h8M8 16h8M8 19h4"
+                        />
+                    </svg>
+                </button>
             </div>
-            <button id="library-example" type="button">Load example</button>
-            <button
-                id="library-root"
-                class="library-root"
-                title="Select root folder; drop items here to move to root"
-            >
-                ⌂ My documents
-            </button>
-            <nav id="library-tree" aria-label="Folders and documents"></nav>
-            <p id="library-selection" class="help"></p>
+            <div class="library-storage">
+                <p id="storage-location" class="help">Storage: browser library</p>
+                <button id="open-directory" type="button">Open local folder…</button>
+                <button id="copy-directory" type="button">Copy library to empty folder…</button>
+                <button id="reconnect-directory" type="button" hidden>Reconnect folder</button>
+                <button id="reload-directory" type="button" hidden>Reload folder from disk</button>
+                <button id="browser-library" type="button" hidden>Use browser library</button>
+                <p id="directory-support" class="help" hidden>
+                    Enable local folder access —
+                    <a id="directory-settings" target="_blank" rel="noopener noreferrer"
+                        >Browser settings</a
+                    >
+                </p>
+            </div>
+            <div id="library-tree" aria-label="Folders and documents"></div>
             <div class="library-actions">
-                <button data-library-action="rename">Rename</button
-                ><button data-library-action="duplicate">Duplicate</button
-                ><button data-library-action="move">Move…</button
-                ><button data-library-action="delete">Delete</button
-                ><button id="export-markdown">Export .md</button>
+                <button
+                    type="button"
+                    data-library-action="rename"
+                    aria-label="Rename"
+                    title="Rename"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="m16 3 5 5-12 12-6 1 1-6zM14 5l5 5" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    data-library-action="duplicate"
+                    aria-label="Duplicate"
+                    title="Duplicate"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <rect x="8" y="8" width="13" height="13" rx="2" />
+                        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+                    </svg>
+                </button>
+                <button type="button" data-library-action="move" aria-label="Move" title="Move">
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M21 9V7a2 2 0 0 0-2-2h-7l-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2M10 13h11m-4-4 4 4-4 4"
+                        />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    data-library-action="delete"
+                    aria-label="Delete"
+                    title="Delete"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    id="export-markdown"
+                    aria-label="Export Markdown"
+                    title="Export Markdown"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />
+                    </svg>
+                </button>
             </div>
-            <p class="help">
+            <p class="help" id="library-storage-help">
                 Saved on this browser and device. Drag items into folders to organize them.
             </p>
         </aside>
@@ -263,8 +426,7 @@
                             hidden
                         ></textarea>
                         <div class="editor-footer">
-                            <span id="filename">untitled.md</span
-                            ><button id="sample" class="text-button">Load example</button>
+                            <button id="sample" class="text-button">Load example</button>
                         </div>
                         <p id="save-state" class="save-state" role="status" aria-live="polite">
                             Opening local library…
@@ -293,15 +455,10 @@
                             spellcheck="false"
                             aria-label="Custom document CSS"
                         ></textarea>
-                        <p class="help">
-                            Style <code>.document</code>, headings, tables, and more. CSS applies
-                            only inside the document preview.
-                        </p>
                     </section>
                     <section class="panel">
                         <div class="panel-heading">
                             <h2>Page setup</h2>
-                            <span class="small-tag">mm</span>
                         </div>
                         <div class="two-columns">
                             <label
@@ -323,33 +480,42 @@
                         </div>
                         <div class="three-columns">
                             <label
-                                >Width<input
-                                    id="width"
-                                    type="number"
-                                    value="210"
-                                    min="50"
-                                    max="1000"
-                                    step="0.1"
-                                    required /></label
+                                >Width<span class="input-unit"
+                                    ><input
+                                        id="width"
+                                        type="number"
+                                        value="210"
+                                        min="50"
+                                        max="1000"
+                                        step="0.1"
+                                        required
+                                    /><span aria-hidden="true">mm</span></span
+                                ></label
                             ><label
-                                >Height<input
-                                    id="height"
-                                    type="number"
-                                    value="297"
-                                    min="50"
-                                    max="1000"
-                                    step="0.1"
-                                    required /></label
+                                >Height<span class="input-unit"
+                                    ><input
+                                        id="height"
+                                        type="number"
+                                        value="297"
+                                        min="50"
+                                        max="1000"
+                                        step="0.1"
+                                        required
+                                    /><span aria-hidden="true">mm</span></span
+                                ></label
                             ><label
-                                >Margins<input
-                                    id="margin"
-                                    type="number"
-                                    value="18"
-                                    min="0"
-                                    max="100"
-                                    step="0.5"
-                                    required
-                            /></label>
+                                >Margins<span class="input-unit"
+                                    ><input
+                                        id="margin"
+                                        type="number"
+                                        value="18"
+                                        min="0"
+                                        max="100"
+                                        step="0.5"
+                                        required
+                                    /><span aria-hidden="true">mm</span></span
+                                ></label
+                            >
                         </div>
                         <div class="divider"></div>
                         <div class="toggle-row">
@@ -358,6 +524,16 @@
                                 ><span>Keep headings and content together.</span></label
                             ><input id="smart" type="checkbox" role="switch" checked />
                         </div>
+                        <label class="table-fragment-setting"
+                            >Minimum rows per table fragment<input
+                                id="table-min-rows"
+                                type="number"
+                                min="1"
+                                max="100"
+                                step="1"
+                                value="3"
+                                required
+                        /></label>
                         <label
                             >Scale range<select id="scale-mode">
                                 <option value="auto">Automatic · preserve readable type</option>
@@ -366,22 +542,28 @@
                         >
                         <div class="two-columns">
                             <label
-                                >Minimum scale (%)<input
-                                    id="min-scale"
-                                    type="number"
-                                    min="50"
-                                    max="100"
-                                    value="90"
-                                    required /></label
+                                >Minimum scale<span class="input-unit"
+                                    ><input
+                                        id="min-scale"
+                                        type="number"
+                                        min="50"
+                                        max="100"
+                                        value="90"
+                                        required
+                                    /><span aria-hidden="true">%</span></span
+                                ></label
                             ><label
-                                >Maximum scale (%)<input
-                                    id="max-scale"
-                                    type="number"
-                                    min="50"
-                                    max="100"
-                                    value="100"
-                                    required
-                            /></label>
+                                >Maximum scale<span class="input-unit"
+                                    ><input
+                                        id="max-scale"
+                                        type="number"
+                                        min="50"
+                                        max="100"
+                                        value="100"
+                                        required
+                                    /><span aria-hidden="true">%</span></span
+                                ></label
+                            >
                         </div>
                         <p class="help" id="scale-help">
                             Calculate a readable range from your document. Edit either bound to
@@ -414,7 +596,7 @@
                             <span class="preview-dot"></span><strong>Print preview</strong
                             ><span id="page-count" class="small-tag">Preparing…</span>
                         </div>
-                        <input id="zoom" type="hidden" value="fit" />
+                        <input id="zoom" type="hidden" value="fit-height" />
                     </div>
                     <div id="status" role="status" aria-live="polite">Preparing your pages…</div>
                     <iframe
@@ -422,13 +604,10 @@
                         title="Document pages"
                         sandbox="allow-same-origin allow-modals"
                     ></iframe>
-                    <div class="preview-footer">
-                        <span>Designed on screen. Ready for paper.</span><span>✦</span>
-                    </div>
                 </section>
             </div>
         </main>
-        <footer class="app-footer"><span>© 2026 MD-Office</span></footer>
+        <footer class="app-footer"><span>© 2026 MD-PDF</span></footer>
         <noscript>This application needs JavaScript to render and paginate Markdown.</noscript>
     </body>
 </html>

@@ -1,4 +1,6 @@
 StackEdit welcome example
 Source: https://raw.githubusercontent.com/benweet/stackedit/master/src/data/welcomeFile.md
 StackEdit contributors; Apache License 2.0.
-Modified for MD-Office: added a feature notice and replaced product names with MD-Office.
+Modified for MD-PDF: added a feature notice and replaced product names with MD-PDF.
+The current getting-started document has since been rewritten with original MD-PDF
+copy and examples. This notice and the license are retained for the earlier adaptation.

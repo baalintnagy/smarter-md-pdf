@@ -2,8 +2,8 @@ export const DOCUMENT_CSS = `
 * { box-sizing:border-box; }
 html, body { margin:0; padding:0; }
 body { background:transparent; }
-#pages { display:flex; flex-direction:column; align-items:center; gap:24px; padding:8px 20px 30px; }
-.page-slot { flex:none; position:relative; }
+#pages { display:grid; grid-template-columns:repeat(auto-fit, var(--preview-page-width, 794px)); justify-content:center; align-items:start; min-width:calc(var(--preview-page-width, 794px) + 40px); gap:24px; padding:8px 20px 30px; }
+.page-slot { position:relative; }
 .sheet { background:white; color:#222222; box-shadow:0 3px 18px #20365017; position:relative; overflow:hidden; }
 .page-body { position:absolute; overflow:visible; }
 .document { display:flow-root; font:11pt/1.65 Arial, Helvetica, sans-serif; overflow-wrap:anywhere; color:var(--doc-ink, #333333); }
@@ -34,7 +34,7 @@ body { background:transparent; }
 .page-caption { text-align:center; font:10px/22px 'Segoe UI',sans-serif; color:#78879c; }
 @media print {
  html,body { background:white; width:auto!important; }
- #pages { display:block; padding:0; }
+ #pages { display:block; min-width:0; padding:0; }
  .page-slot { width:auto!important; height:auto!important; margin:0!important; }
  .sheet { transform:none!important; box-shadow:none; margin:0; break-after:page; page-break-after:always; }
  .page-slot:last-child .sheet { break-after:auto; page-break-after:auto; }

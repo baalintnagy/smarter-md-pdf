@@ -35,6 +35,21 @@ export class WorkspaceStorage {
         ]);
         return { snapshot: workspace?.snapshot, revision: workspace?.revision || 0, assets };
     }
+    async directoryHandle() {
+        const database = await this.open();
+        return requestResult(
+            database.transaction('workspace').objectStore('workspace').get('directory'),
+        );
+    }
+    async rememberDirectory(handle) {
+        const database = await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = database.transaction('workspace', 'readwrite');
+            transaction.objectStore('workspace').put(handle, 'directory');
+            transaction.oncomplete = resolve;
+            transaction.onabort = transaction.onerror = () => reject(transaction.error);
+        });
+    }
     async save(snapshot, expectedRevision, assets) {
         const database = await this.open();
         return new Promise((resolve, reject) => {

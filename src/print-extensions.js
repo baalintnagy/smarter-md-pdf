@@ -10,14 +10,29 @@ export function installMathStyles(document) {
 /** Render only sanitized source nodes, before measuring pagination. */
 export async function renderPrintExtensions(root) {
     const warnings = [];
+    for (const code of root.querySelectorAll('pre > code.language-asciimath')) {
+        const node = root.ownerDocument.createElement('div');
+        node.className = 'math-source math-display asciimath-source';
+        node.textContent = code.textContent.trim();
+        code.parentElement.replaceWith(node);
+    }
     const math = [...root.querySelectorAll('.math-source')];
     if (math.length) {
         const { default: katex } = await import('katex');
+        const AsciiMath = math.some((node) => node.classList.contains('asciimath-source'))
+            ? (await import('asciimath-parser')).AsciiMath
+            : null;
+        const inlineParser = AsciiMath ? new AsciiMath({ display: false }) : null;
+        const displayParser = AsciiMath ? new AsciiMath({ display: true }) : null;
         for (const node of math) {
             const source = node.textContent;
             try {
-                katex.render(source, node, {
-                    displayMode: node.classList.contains('math-display'),
+                const displayMode = node.classList.contains('math-display');
+                const tex = node.classList.contains('asciimath-source')
+                    ? (displayMode ? displayParser : inlineParser).toTex(source)
+                    : source;
+                katex.render(tex, node, {
+                    displayMode,
                     trust: false,
                     throwOnError: true,
                     maxExpand: 1000,

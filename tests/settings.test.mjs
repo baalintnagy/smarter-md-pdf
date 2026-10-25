@@ -17,8 +17,16 @@ test('rejects impossible or incomplete layouts', () => {
         { minScale: 95, maxScale: 90 },
         { minScale: 49 },
         { maxScale: 101 },
+        { minTableRows: 0 },
+        { minTableRows: 101 },
+        { minTableRows: 1.5 },
+        { minTableRows: NaN },
     ]) {
         assert.throws(() => validateSettings({ ...valid, ...change }));
     }
     assert.throws(() => validateSettings({ ...valid, width: 50, margin: 23 }));
+});
+
+test('accepts a configurable minimum table fragment size', () => {
+    assert.equal(validateSettings({ ...valid, minTableRows: 5 }).minTableRows, 5);
 });

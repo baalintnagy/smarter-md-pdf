@@ -41,6 +41,26 @@ try {
             ).join('\n\n'),
     );
     assert.ok((await preview.locator('.sheet').count()) > 3);
+    const zoomSlider = page.getByRole('slider', { name: 'Print preview zoom', exact: true });
+    await zoomSlider.fill('0');
+    const grid = await preview.locator('.page-slot').evaluateAll((slots) =>
+        slots.map((slot) => {
+            const rect = slot.getBoundingClientRect();
+            return { x: rect.x, y: rect.y };
+        }),
+    );
+    assert.equal(grid[0].y, grid[1].y, 'Small page previews share a grid row');
+    assert.ok(grid[1].x > grid[0].x, 'Page order runs left to right');
+    assert.ok(
+        grid.some((slot) => slot.y > grid[0].y),
+        'Additional previews wrap to another row',
+    );
+    await zoomSlider.fill('1000');
+    const column = await preview
+        .locator('.page-slot')
+        .evaluateAll((slots) => slots.slice(0, 2).map((slot) => slot.getBoundingClientRect().y));
+    assert.ok(column[1] > column[0], 'Large previews return to a single column');
+    await page.getByRole('button', { name: 'Fit vertically', exact: true }).click();
     let allText = (await preview.locator('.sheet .document').allTextContents()).join('');
     for (let i = 0; i < 85; i++) {
         assert.ok(allText.includes(`Paragraph ${i}:`), `Missing paragraph ${i}`);
@@ -252,6 +272,21 @@ try {
             'No stranded heading',
         );
     }
+    await page.locator('#table-min-rows').fill('5');
+    await ready();
+    const configuredRows = await preview
+        .locator('table')
+        .evaluateAll((tables) => tables.map((table) => table.querySelectorAll('tbody tr').length));
+    assert.ok(
+        configuredRows.length > 1 && configuredRows.every((count) => count >= 5),
+        `Configured minimum table rows respected: ${configuredRows}`,
+    );
+    assert.equal(
+        configuredRows.reduce((sum, count) => sum + count, 0),
+        17,
+    );
+    await page.locator('#table-min-rows').fill('3');
+    await ready();
     // A near-fit table can shrink independently; the earlier paragraph and heading stay at 100%.
     await page.locator('#min-scale').fill('80');
     await ready();

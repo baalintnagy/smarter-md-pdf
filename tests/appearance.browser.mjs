@@ -41,8 +41,52 @@ try {
     const splitter = page.getByRole('separator', { name: 'Resize editor and preview' });
     const handle = await splitter.boundingBox();
     const work = await page.locator('.workspace').boundingBox();
+    const originalScroll = await page.evaluate(() => scrollY);
     await page.mouse.move(handle.x + handle.width / 2, handle.y + 40);
     await page.mouse.down();
+    assert.equal(
+        await page.evaluate(() => scrollY),
+        originalScroll,
+        'Grabbing the splitter does not scroll the page',
+    );
+    let previousEditorWidth = editorWidth;
+    for (let step = 1; step <= 24; step++) {
+        const start = handle.x + handle.width / 2;
+        const end = work.x + work.width + 150;
+        await page.mouse.move(start + ((end - start) * step) / 24, handle.y + 40);
+        await page.evaluate(() => new Promise(requestAnimationFrame));
+        const editor = await page.locator('.controls').boundingBox();
+        const panelWidths = await page
+            .locator('.controls > .panel')
+            .evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().width));
+        assert.ok(
+            editor.width >= previousEditorWidth - 0.5,
+            `Editor does not jump backward while dragging right: ${previousEditorWidth} → ${editor.width}`,
+        );
+        assert.ok(
+            panelWidths.every((width) => Math.abs(width - editor.width) < 1),
+            'Editor cards keep the column width throughout the drag',
+        );
+        assert.ok(
+            Math.abs(editor.x - work.x) < 1,
+            'Editor stays anchored to the workspace left edge',
+        );
+        previousEditorWidth = editor.width;
+    }
+    const rightLimit = await page.locator('.preview-panel').boundingBox();
+    assert.ok(
+        rightLimit.width >= 299 && rightLimit.width <= 301,
+        'Dragging beyond the right edge keeps a stable preview minimum',
+    );
+    assert.equal(
+        await page.evaluate(() => scrollY),
+        originalScroll,
+        'Dragging to the right limit does not jump vertically',
+    );
+    assert.ok(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+        'Dragging to the right limit does not overflow the workspace',
+    );
     await page.mouse.move(work.x + work.width * 0.68, handle.y + 40, { steps: 8 });
     await page.mouse.up();
     assert.ok(
@@ -75,6 +119,30 @@ try {
     );
     await page.keyboard.press('Enter');
     assert.equal(await splitter.getAttribute('aria-valuenow'), '55', 'Enter resets proportions');
+    await page.locator('#library-toggle').click();
+    const openWork = await page.locator('.workspace').boundingBox();
+    const openHandle = await splitter.boundingBox();
+    let openWidth = (await page.locator('.controls').boundingBox()).width;
+    await page.mouse.move(openHandle.x + openHandle.width / 2, openHandle.y + 40);
+    await page.mouse.down();
+    for (let step = 1; step <= 16; step++) {
+        const start = openHandle.x + openHandle.width / 2;
+        await page.mouse.move(
+            start + ((openWork.x + openWork.width + 100 - start) * step) / 16,
+            openHandle.y + 40,
+        );
+        await page.evaluate(() => new Promise(requestAnimationFrame));
+        const width = (await page.locator('.controls').boundingBox()).width;
+        assert.ok(
+            width >= openWidth - 0.5,
+            'Right-edge drag stays monotonic with the library open',
+        );
+        openWidth = width;
+    }
+    await page.mouse.up();
+    await page.locator('#library-toggle').click();
+    await splitter.focus();
+    await page.keyboard.press('Enter');
     assert.ok(
         (await rich.evaluate((node) => getComputedStyle(node).fontFamily)).includes('Consolas'),
     );
@@ -181,12 +249,12 @@ try {
     await page.screenshot({ path: 'test-results/blue-studio.png', fullPage: true });
     await page.locator('#theme').click();
     await page.waitForFunction(
-        () => getComputedStyle(document.body).backgroundColor === 'rgb(21, 30, 45)',
+        () => getComputedStyle(document.body).backgroundColor === 'rgb(22, 29, 41)',
     );
     await page.waitForFunction(
         () =>
             getComputedStyle(document.querySelector('#visual-editor .ProseMirror')).color ===
-            'rgb(224, 233, 246)',
+            'rgb(213, 222, 235)',
     );
     await page.screenshot({ path: 'test-results/blue-studio-dark.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });

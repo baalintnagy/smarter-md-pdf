@@ -20,17 +20,43 @@ try {
         }
     });
     await page.goto(`http://127.0.0.1:${process.env.PORT || 4173}${process.env.SITE_BASE || ''}/`);
+    await page.waitForFunction(
+        () => !document.getElementById('print').disabled,
+        {},
+        { timeout: 60000 },
+    );
+    const samplePreview = page.frameLocator('#preview');
+    assert.equal(await samplePreview.locator('#pages .mermaid-diagram').count(), 4);
+    assert.equal(await samplePreview.locator('#pages .katex-display').count(), 7);
+    assert.equal(await samplePreview.locator('#pages .asciimath-source .katex').count(), 4);
+    assert.equal(await samplePreview.locator('#pages .render-error').count(), 0);
+    for (const diagram of await samplePreview.locator('#pages .mermaid-diagram').all()) {
+        assert.ok(await diagram.evaluate((node) => node.naturalWidth > 0));
+    }
     await page.locator('#mode-markdown').click();
     const source =
         '# Equations and diagrams\n\nInline $E = mc^2$ and \\(a^2+b^2=c^2\\).\n\n$$\n\\Gamma(z) = \\int_0^\\infty t^{z-1}e^{-t}\\,dt\n$$\n\n\\[\n\\frac{1}{2} + \\sqrt{x}\n\\]\n\n## Flow\n\n```mermaid\nflowchart LR\nA[Write] --> B[Preview] --> C[Print PDF]\n```\n\n## Sequence\n\n```mermaid\nsequenceDiagram\nAlice->>Bob: Hello\nBob-->>Alice: Hi\n```\n\nCode stays literal: `$x^2$`.\n\n```tex\n$x^2$\n```';
-    await page.locator('#markdown').fill(source);
+    const asciiSource =
+        '\n\nInline AsciiMath @{sqrt({x^2 + y^2})}, comparison @{x < y}, and quoted text @{"units"}.\n\n```asciimath\nsum_(n=1)^oo 1/n^2 = pi^2/6\n```\n\nLiteral AsciiMath: `@{sqrt(x)}`. Escaped marker: \\@{sqrt(x)}. Unclosed marker: @{missing\n\n```text\n@{sqrt(x)}\n```';
+    await page.locator('#markdown').fill(source + asciiSource);
     await page.waitForFunction(
         () => !document.getElementById('print').disabled,
         {},
         { timeout: 60000 },
     );
     const preview = page.frameLocator('#preview');
-    assert.equal(await preview.locator('#pages .katex').count(), 4);
+    assert.equal(await preview.locator('#pages .katex').count(), 8);
+    assert.equal(await preview.locator('#pages .asciimath-source .katex').count(), 4);
+    assert.equal(await preview.locator('#pages .asciimath-source.math-display').count(), 1);
+    assert.equal(await preview.locator('#pages .render-error').count(), 0);
+    assert.equal(
+        await preview
+            .locator('#pages code')
+            .evaluateAll(
+                (nodes) => nodes.filter((node) => node.textContent.trim() === '@{sqrt(x)}').length,
+            ),
+        2,
+    );
     assert.equal(await preview.locator('#pages .mermaid-diagram').count(), 2);
     for (const img of await preview.locator('#pages .mermaid-diagram').all()) {
         assert.ok(await img.evaluate((node) => node.naturalWidth > 0));
@@ -71,14 +97,16 @@ try {
     await page.screenshot({ path: 'test-results/math-diagrams.png', fullPage: true });
     await page
         .locator('#markdown')
-        .fill('Bad $\\notACommand{x}$ math\n\n```mermaid\ninvalid diagram input\n```');
+        .fill(
+            'Bad $\\notACommand{x}$ math and @{color(#zzzzzz)(x)}\n\n```mermaid\ninvalid diagram input\n```',
+        );
     await page.waitForFunction(() => !document.getElementById('print').disabled);
     assert.ok((await page.locator('#status').textContent()).includes('could not be rendered'));
-    assert.equal(await preview.locator('#pages .render-error').count(), 2);
+    assert.equal(await preview.locator('#pages .render-error').count(), 3);
     assert.deepEqual(errors, []);
     assert.deepEqual(failed, []);
     console.log(
-        'Print extensions passed: inline/display TeX, flowchart/sequence SVG, local fonts, literal code, PDF generation, invalid-source fallback.',
+        'Print extensions passed: inline/display TeX and AsciiMath, sample diagrams, local fonts, literal code, PDF generation, invalid-source fallback.',
     );
 } finally {
     await browser.close();

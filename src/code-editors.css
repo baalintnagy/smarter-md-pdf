@@ -7,11 +7,11 @@
     --syntax-name: #185e83;
 }
 :root[data-theme='dark'] {
-    --syntax-keyword: #88baff;
-    --syntax-string: #e3be8a;
-    --syntax-comment: #92a3b8;
-    --syntax-number: #c5a1ed;
-    --syntax-name: #7ed0ee;
+    --syntax-keyword: #89afe9;
+    --syntax-string: #d2b287;
+    --syntax-comment: #8c9bb0;
+    --syntax-number: #b99adc;
+    --syntax-name: #7ec0d9;
 }
 .code-editor {
     position: relative;

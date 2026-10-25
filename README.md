@@ -1,4 +1,4 @@
-# MD-Office
+# MD-PDF
 
 A static, local-first Markdown print studio for GitHub Pages. Write visually or edit Markdown source, open/drop `.md`, `.markdown`, or `.txt` files, customize document CSS, and print selectable text to PDF. Vite bundles the browser editor at build time; the deployed app needs no backend or runtime CDN.
 
@@ -31,6 +31,45 @@ Open the left drawer with the library button. Create documents and nested folder
 
 Edits autosave locally; Save and Ctrl/Cmd+S also save explicitly. The status beneath the editor reports success or storage errors. Reloading restores the active document, its style, paper settings, and imported images. A revision check rejects stale saves from another tab: export an unsaved draft before reloading that tab. This is a local library with no account or cloud sync.
 
+### Local folder storage
+
+In desktop Chrome or Edge, use **Open local folder…** in the library to work directly
+with a folder on your computer. Grant read/write access when the browser asks. This
+works on HTTPS hosting (including GitHub Pages) and localhost, without a backend.
+Browsers without the directory picker keep the browser library and Markdown export.
+Brave disables this API by default. To enable it, open
+`brave://flags/#file-system-access-api`, enable **File System Access API**, and relaunch
+Brave. If that setting is unavailable in your version, use Chrome or Edge for folder
+storage. For local development, open `http://127.0.0.1:4173` or
+`http://localhost:4173`; an HTTP LAN address such as `http://192.168.x.x` does not
+provide the secure context this API requires.
+
+The folder's `.md`, `.markdown`, and `.txt` files appear in the library, with real
+subfolders. New document names without one of these extensions receive `.md` on disk.
+Styles, paper settings, the active document, and expanded folders are saved in
+`.md-pdf.json`; keep this companion file when moving the workspace. Raster images
+are read from disk, and newly imported images are saved alongside the active document.
+Image paths resolve relative to each document. Moving documents does not rewrite
+their image references; adjust relative paths when needed. Hidden directories and
+`node_modules` are excluded. Disk names must be portable Windows-compatible names.
+
+Use **Copy library to empty folder…** to migrate the browser library and its images.
+The browser copy remains available through **Use browser library**. Opening an existing
+folder switches workspaces without merging them. The selected folder handle is
+remembered in IndexedDB; when access has expired, use **Reconnect folder**. While
+disconnected, the app opens the browser library and labels that storage location.
+Clearing site data forgets the connection but leaves disk files intact; select the
+folder again to reconnect.
+
+Autosave, **Save**, and **Ctrl/Cmd+S** write directly to the selected folder. Changes
+to Markdown, images, metadata, or the folder tree outside the app block the next save.
+Export any unsaved Markdown, then use **Reload folder from disk** to read external
+changes. Saves spanning several files are not atomic; after a disk write fails, reload
+before retrying. Avoid editing the same folder simultaneously in other applications.
+Deleting or moving items removes the old Markdown files and empty folders, but never
+recursively removes unrelated files or images. Nonempty folders containing these files
+can reappear after reloading. There is no disk trash or undo for library deletion.
+
 ## Document styles
 
 **Document style** offers six editable CSS templates: Grayscale (modern sans), Editorial (grayscale serif), Technical (monochrome monospace), Ocean (blue serif), Indigo (sans), and Terracotta (warm serif). The default document is entirely grayscale, including links, quotes, tables, and code tokens; editor syntax colors belong to the interface and are independent of print colors. Templates use local system fonts, so no external font downloads are required. Choosing a template replaces the current CSS; typing or importing a stylesheet switches the selector to Custom CSS. Templates set `--doc-ink`, `--doc-heading`, `--doc-accent`, `--doc-tint`, and `--doc-border` on `.document`, and can be customized further with ordinary CSS rules. Paper and font changes trigger fresh pagination.
@@ -55,9 +94,28 @@ The same PNG can be uploaded as the repository's social preview in GitHub settin
 
 Print preview renders fenced `mermaid` blocks as vector diagrams, and KaTeX expressions using `$…$` or `\(…\)` inline and `$$…$$` or `\[…\]` on separate lines for display equations. Write these in Markdown mode; the visual editor keeps code fences as editable source. Both libraries and the math fonts are bundled locally. Rendering and font/image loading finish before pagination. Invalid expressions retain their source with a warning. Equations and diagrams remain intact across page breaks; oversized content can require smaller typography or larger paper. Diagrams are inert SVG images; KaTeX uses its untrusted-input mode.
 
+### AsciiMath
+
+Alongside LaTeX math, use `@{sqrt(x^2 + y^2)}` for inline AsciiMath. The delimiters
+support nested braces and quoted text, and must close on the same line. Ordinary
+code spans and code fences remain literal. Use a fence labeled `asciimath` for a
+display formula:
+
+````markdown
+```asciimath
+sum_(n=1)^oo 1/n^2 = pi^2/6
+```
+````
+
+Write these expressions in Markdown mode. The locally bundled `asciimath-parser`
+converts them to LaTeX, and KaTeX typesets them before pagination with the same
+untrusted-input restrictions as existing math. AsciiMath parsing is permissive;
+check the preview when editing incomplete expressions. Rendering errors retain the
+source with a warning. No additional CDN or MathJax runtime is needed.
+
 ## Printing
 
-Choose A3, A4, A5, Letter, Legal, Tabloid, or numeric custom dimensions in millimetres. Orientation swaps dimensions. Margins apply on every page. Smart pagination measures the rendered DOM and keeps heading chains with actual following content, including the first fragment of a long table or paragraph. Tables use available space on the current page before starting another page, repeat their header, and keep at least three data rows on both sides of a split. Only when a fresh page physically cannot accommodate that constraint is the minimum relaxed. Small tables move intact when possible; rows are never split as arbitrary text.
+Choose A3, A4, A5, Letter, Legal, Tabloid, or numeric custom dimensions in millimetres. Orientation swaps dimensions. Margins apply on every page. Smart pagination measures the rendered DOM and keeps heading chains with actual following content, including the first fragment of a long table or paragraph. Tables use available space on the current page before starting another page and repeat their header. **Minimum rows per table fragment** sets how many data rows to keep on both sides of a split (1–100, default 3), and is saved per document. Only when a fresh page physically cannot accommodate that constraint is the minimum relaxed. Small tables move intact when possible; rows are never split as arbitrary text.
 
 Compact subsections (a heading and following content up to the next heading or manual break, at most one-third of a printable page) stay together if they cannot fit at the page bottom. Longer lists split by measured item groups, keeping at least three items on both sides when physically possible, with ordered-list numbering preserved. This avoids a subsection heading stranded with just one or two bullets while still letting larger sections use remaining page space.
 
@@ -71,7 +129,7 @@ Add `<div class="page-break"></div>` on its own line for a manual page break. Cu
 
 ## Files and privacy
 
-Multiple Markdown files are independently editable through the document selector. Import raster images alongside Markdown to resolve relative image paths by filename. Import only supported Markdown/text and image files through the main picker; use **Import CSS** for a stylesheet. SVG imports are intentionally excluded. Remote HTTP(S) images and CSS resources still make network requests. Missing or timed-out images produce a warning. Documents, CSS, paper settings, folder trees, and imported raster images persist in IndexedDB on this browser and site origin. Theme and column-width preferences are also remembered. Clearing browser site data removes the library; other devices and browsers do not share it. Export Markdown downloads source only, without CSS or image files.
+Multiple Markdown files are independently editable through the document selector. Import raster images alongside Markdown to resolve relative image paths by filename. Import only supported Markdown/text and image files through the main picker; use **Import CSS** for a stylesheet. SVG imports are intentionally excluded. Remote HTTP(S) images and CSS resources still make network requests. Missing or timed-out images produce a warning. By default, documents, CSS, paper settings, folder trees, and imported raster images persist in IndexedDB on this browser and site origin. Optional local folder mode saves these to disk instead, remembering the folder handle in IndexedDB. Theme and column-width preferences are also remembered. Clearing browser site data removes the browser library and folder connection, but does not remove disk files. Other devices and browsers do not share the browser library. Export Markdown downloads source only, without CSS or image files.
 
 Print Markdown is parsed with locally vendored Marked 17.0.5 (MIT; see `vendor/MARKED-LICENSE.md`) and rebuilt through an HTML allowlist. Scripts, event handlers, styles, embedded frames, and active URLs are removed from print output. Custom CSS is confined to a sandboxed iframe, separately from the application UI. CSS is user-controlled and can load remote resources. UI dark/light themes fade over 800 ms (instant with reduced motion); paper remains as styled for print. Milkdown/Crepe and its dependencies are bundled locally; the build includes their license notices in `dist/THIRD-PARTY-NOTICES.txt`.
 
@@ -90,7 +148,8 @@ The sibling `baalintnagy.github.io` project informed the browser-rendered HTML a
 - `src/paginator.js`: DOM measurement, bounded scaling, and structural/text splits.
 - `src/document-library.js`: document lifecycle, autosave, and drawer actions.
 - `src/workspace-model.js`: validated nested folder and document operations.
-- `src/workspace-storage.js`: atomic IndexedDB persistence and revision checks.
+- `src/workspace-storage.js`: atomic IndexedDB persistence, folder handles, and revision checks.
+- `src/directory-storage.js`: local folder loading, direct disk writes, and change detection.
 - `src/files.js`: file imports and object URL ownership.
 - `src/settings.js`: paper presets and validation.
 - `src/scaling.js`: typography-based automatic range and per-block readability limits.

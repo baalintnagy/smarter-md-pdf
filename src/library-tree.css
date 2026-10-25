@@ -1,0 +1,53 @@
+#library-tree {
+    --wb-font-stack: inherit;
+    --wb-background-color: var(--surface);
+    --wb-node-text-color: var(--text);
+    --wb-border-color: var(--border);
+    --wb-focus-border-color: var(--accent);
+    --wb-active-color: var(--soft);
+    --wb-active-border-color: var(--border);
+    --wb-active-color-grayscale: var(--soft);
+    --wb-active-border-color-grayscale: var(--border);
+    --wb-hover-color: var(--soft);
+    --wb-active-hover-color: var(--soft);
+    --wb-active-hover-border-color: var(--border);
+    --wb-drop-target-color: var(--soft);
+    border: 0;
+    border-radius: 0;
+    height: auto;
+    font-size: 13px;
+    overflow: auto;
+}
+#library-tree.root-drop-target {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* Lines occupy the component's existing indentation cells; icons keep their native layout. */
+#library-tree .wb-indent:not(.wb-expander) {
+    position: relative;
+}
+#library-tree .tree-line-through::before,
+#library-tree .tree-line-branch::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    left: 50%;
+    top: calc((var(--wb-icon-outer-height) - var(--wb-row-outer-height)) / 2);
+    width: 1px;
+    height: var(--wb-row-outer-height);
+    background: var(--border);
+}
+#library-tree .tree-line-last::before {
+    height: calc(var(--wb-row-outer-height) / 2);
+}
+#library-tree .tree-line-branch::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    left: 50%;
+    top: 50%;
+    width: 50%;
+    height: 1px;
+    background: var(--border);
+}

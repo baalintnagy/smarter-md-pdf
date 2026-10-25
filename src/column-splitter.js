@@ -3,6 +3,9 @@ export function initializeColumnSplitter(workspace, separator) {
     const defaultShare = 0.55;
     let share = defaultShare;
     let pointer = null;
+    let grabOffset = 8;
+    let pendingX = null;
+    let dragFrame = null;
     const mobile = matchMedia('(max-width:740px)');
     try {
         const saved = Number(localStorage.getItem('smarter-editor-share'));
@@ -13,7 +16,7 @@ export function initializeColumnSplitter(workspace, separator) {
         /* Storage is optional. */
     }
     const bounds = () => {
-        const available = Math.max(600, workspace.clientWidth - 16);
+        const available = Math.max(600, workspace.getBoundingClientRect().width - 16);
         return {
             available,
             min: Math.max(0.2, 300 / available),
@@ -24,10 +27,14 @@ export function initializeColumnSplitter(workspace, separator) {
         if (mobile.matches) {
             return;
         }
-        const { min, max } = bounds();
+        const { min, max, available } = bounds();
         const actual = Math.max(min, Math.min(max, share));
-        workspace.style.setProperty('--editor-column', `${actual}fr`);
-        workspace.style.setProperty('--preview-column', `${1 - actual}fr`);
+        const editorWidth = Math.max(
+            300,
+            Math.min(available - 300, Math.round(available * actual)),
+        );
+        workspace.style.setProperty('--editor-column', `${editorWidth}px`);
+        workspace.style.setProperty('--preview-column', `${available - editorWidth}px`);
         separator.setAttribute('aria-valuemin', String(Math.ceil(min * 100)));
         separator.setAttribute('aria-valuemax', String(Math.floor(max * 100)));
         separator.setAttribute('aria-valuenow', String(Math.round(actual * 100)));
@@ -48,7 +55,20 @@ export function initializeColumnSplitter(workspace, separator) {
         share = Math.max(min, Math.min(max, next));
         apply();
     };
+    const move = () => {
+        dragFrame = null;
+        if (pendingX === null) {
+            return;
+        }
+        const x = pendingX;
+        pendingX = null;
+        set((x - workspace.getBoundingClientRect().left - grabOffset) / bounds().available);
+    };
     const end = () => {
+        if (dragFrame !== null) {
+            cancelAnimationFrame(dragFrame);
+        }
+        move();
         pointer = null;
         document.body.classList.remove('resizing-columns');
         save();
@@ -58,8 +78,9 @@ export function initializeColumnSplitter(workspace, separator) {
             return;
         }
         event.preventDefault();
-        separator.focus();
+        separator.focus({ preventScroll: true });
         pointer = event.pointerId;
+        grabOffset = event.clientX - separator.getBoundingClientRect().left;
         separator.setPointerCapture(pointer);
         document.body.classList.add('resizing-columns');
     });
@@ -67,7 +88,10 @@ export function initializeColumnSplitter(workspace, separator) {
         if (event.pointerId !== pointer) {
             return;
         }
-        set((event.clientX - workspace.getBoundingClientRect().left - 8) / bounds().available);
+        pendingX = event.clientX;
+        if (dragFrame === null) {
+            dragFrame = requestAnimationFrame(move);
+        }
     });
     for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
         separator.addEventListener(event, () => {
@@ -98,7 +122,13 @@ export function initializeColumnSplitter(workspace, separator) {
         apply();
         save();
     });
-    new ResizeObserver(apply).observe(workspace);
+    let observedWidth = null;
+    new ResizeObserver(([entry]) => {
+        if (entry.contentRect.width !== observedWidth) {
+            observedWidth = entry.contentRect.width;
+            apply();
+        }
+    }).observe(workspace);
     mobile.addEventListener('change', () => {
         if (pointer !== null) {
             end();

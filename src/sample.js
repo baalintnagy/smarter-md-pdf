@@ -1,5 +1,267 @@
-// Adapted from StackEdit welcomeFile.md (Apache-2.0).
-// Modifications: added a feature notice and replaced product names with MD-Office.
-// See public/licenses/STACKEDIT-*.txt for source attribution and license.
-export const SAMPLE =
-    "> **Example document:** MD-Office supports Markdown editing, local files, styles, and PDF printing; Mermaid diagrams and KaTeX math render in print preview. Cloud sync and publishing are not available here.\n\n# Welcome to MD-Office!\n\nHi! I'm your first Markdown file in **MD-Office**. If you want to learn about MD-Office, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.\n\n\n# Files\n\nMD-Office stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**\n\n## Create files and folders\n\nThe file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.\n\n## Switch to another file\n\nAll your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.\n\n## Rename a file\n\nYou can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.\n\n## Delete a file\n\nYou can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.\n\n## Export a file\n\nYou can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.\n\n\n# Synchronization\n\nSynchronization is one of the biggest features of MD-Office. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.\n\nThere are two types of synchronization and they can complement each other:\n\n- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.\n\t> To start syncing your workspace, just sign in with Google in the menu.\n\n- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.\n\t> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.\n\n## Open a file\n\nYou can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.\n\n## Save a file\n\nYou can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. MD-Office can sync one file with multiple locations and accounts.\n\n## Synchronize a file\n\nOnce your file is linked to a synchronized location, MD-Office will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.\n\nIf you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.\n\n> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.\n\n## Manage file synchronization\n\nSince one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.\n\n\n# Publication\n\nPublishing in MD-Office makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.\n\n> Before starting to publish, you must link an account in the **Publish** sub-menu.\n\n## Publish a File\n\nYou can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:\n\n- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),\n- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).\n\n## Update a publication\n\nAfter publishing, MD-Office keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.\n\n> **Note:** The **Publish now** button is disabled if your file has not been published yet.\n\n## Manage file publication\n\nSince one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.\n\n\n# Markdown extensions\n\nMD-Office extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.\n\n> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.\n\n\n## SmartyPants\n\nSmartyPants converts ASCII punctuation characters into \"smart\" typographic punctuation HTML entities. For example:\n\n|                |ASCII                          |HTML                         |\n|----------------|-------------------------------|-----------------------------|\n|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |\n|Quotes          |`\"Isn't this fun?\"`            |\"Isn't this fun?\"            |\n|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|\n\n\n## KaTeX\n\nYou can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):\n\nThe *Gamma function* satisfying $\\Gamma(n) = (n-1)!\\quad\\forall n\\in\\mathbb N$ is via the Euler integral\n\n$$\n\\Gamma(z) = \\int_0^\\infty t^{z-1}e^{-t}dt\\,.\n$$\n\n> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).\n\n\n## UML diagrams\n\nYou can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:\n\n```mermaid\nsequenceDiagram\nAlice ->> Bob: Hello Bob, how are you?\nBob-->>John: How about you John?\nBob--x Alice: I am good thanks!\nBob-x John: I am good thanks!\nNote right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.\n\nBob-->Alice: Checking with John...\nAlice->John: Yes... John, how are you?\n```\n\nAnd this will produce a flow chart:\n\n```mermaid\ngraph LR\nA[Square Rect] -- Link text --> B((Circle))\nA --> C(Round Rect)\nB --> D{Rhombus}\nC --> D\n```\n";
+// Original MD-PDF getting-started document.
+// Historical StackEdit attribution is retained under public/licenses/.
+export const SAMPLE = `# From a rough note to a finished page
+
+A useful document starts with an idea. **MD-PDF** gives you a place to shape it,
+check the layout, and turn it into a PDF you can share.
+
+This file is a small practice space. Change a heading, add a row to the table, or
+try another document style and watch the print preview respond.
+
+## Find your writing rhythm
+
+Use **Visual** mode to format text as you write. Switch to **Markdown** when you
+want to work directly with headings, links, lists, and code fences.
+
+A little formatting goes a long way: **bold** draws attention, *italics* add
+emphasis, and ~~crossed-out text~~ records an idea you have moved past.
+Use inline code such as \`meeting-notes.md\` for filenames and short commands.
+Add a link when readers need a reference, such as the
+[MD-PDF project](https://github.com/baalintnagy/smarter-md-pdf).
+
+> Give each section one job. A clear heading and a few precise sentences are
+> often enough to help the next reader find their way.
+
+### A quick checklist
+
+- [x] Give the document a clear title.
+- [x] Group related ideas under headings.
+- [ ] Replace this example with something of your own.
+- [ ] Check the preview before printing.
+
+### A short plan
+
+1. Capture the main point while it is fresh.
+2. Add the details that support it.
+3. Read the result as someone seeing it for the first time.
+
+## Keep the details together
+
+Tables work well for compact comparisons. In Visual mode, use **Table** to insert
+one, then click a cell to find row, column, and alignment controls.
+
+| Stage | What to do | Ready when |
+| :--- | :--- | :--- |
+| Draft | Collect the facts | The main idea is clear |
+| Edit | Tighten the wording | Every section earns its place |
+| Share | Review the PDF | The pages are easy to read |
+
+Code fences preserve spacing and add syntax highlighting for supported languages:
+
+\`\`\`javascript
+const sections = ['Draft', 'Edit', 'Share'];
+const checklist = sections.map((section) => ({
+    title: section,
+    complete: false,
+}));
+\`\`\`
+
+## Write formulas with KaTeX
+
+Write LaTeX-style math in Markdown mode; KaTeX typesets it in the print preview.
+Use single dollar signs for inline expressions and double dollar signs on their
+own lines for display equations. Inline code keeps syntax literal: \`$x^2$\`.
+
+For example, a simple completion rate is $r = \\frac{d}{n}$, where $d$ is the number
+of finished tasks and $n > 0$ is the total. As a display equation:
+
+$$
+\\text{progress} = \\frac{\\text{finished tasks}}{\\text{total tasks}} \\times 100\\%
+$$
+
+### Roots of a quadratic
+
+For $ax^2 + bx + c = 0$ with $a \\ne 0$, the quadratic formula is:
+
+$$
+x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}
+$$
+
+### Aligned equations and sums
+
+For $n > 0$ observations, their mean and population variance can be written together:
+
+$$
+\\begin{aligned}
+\\mu &= \\frac{1}{n} \\sum_{i=1}^{n} x_i \\\\
+\\sigma^2 &= \\frac{1}{n} \\sum_{i=1}^{n} (x_i - \\mu)^2
+\\end{aligned}
+$$
+
+### Matrices
+
+A two-dimensional rotation uses a matrix and a column vector:
+
+$$
+\\begin{bmatrix} x' \\\\ y' \\end{bmatrix}
+= \\begin{bmatrix}
+\\cos \\theta & -\\sin \\theta \\\\
+\\sin \\theta & \\cos \\theta
+\\end{bmatrix}
+\\begin{bmatrix} x \\\\ y \\end{bmatrix}
+$$
+
+### Piecewise functions
+
+Use a cases environment to show a rule with different branches:
+
+$$
+|x| = \\begin{cases}
+x & \\text{if } x \\ge 0, \\\\
+-x & \\text{if } x < 0.
+\\end{cases}
+$$
+
+## Try AsciiMath for simpler input
+
+AsciiMath offers a compact alternative to LaTeX. Wrap inline expressions in
+\`@{…}\`: the length of a right triangle's hypotenuse is @{sqrt(x^2 + y^2)}.
+Fractions can be written directly as @{(a + b)/(c + d)}.
+
+For a display equation, use a fenced block labeled \`asciimath\`:
+
+\`\`\`asciimath
+x = (-b +- sqrt(b^2 - 4 a c)) / (2 a)
+\`\`\`
+
+Subscripts, superscripts, sums, and Greek letters work too:
+
+\`\`\`asciimath
+sum_(n=1)^oo 1/n^2 = pi^2/6
+\`\`\`
+
+AsciiMath is converted to LaTeX and typeset with KaTeX in the print preview.
+Keep ordinary code in backticks, such as \`@{sqrt(x)}\`, to show the source literally.
+
+## Explain a process with Mermaid
+
+In Markdown mode, put diagram source inside a fenced code block labeled
+\`mermaid\`. The print preview draws the diagram; the editor keeps its source editable.
+
+### Flowchart: make a decision
+
+Shapes and labeled branches help explain a review workflow:
+
+\`\`\`mermaid
+flowchart LR
+    A([Start]) --> B[Write a draft]
+    B --> C{Ready to share?}
+    C -->|Needs changes| B
+    C -->|Approved| D[Save a PDF]
+    D --> E([Done])
+\`\`\`
+
+### Sequence diagram: follow a conversation
+
+Participants exchange messages in order. An alternative block shows two outcomes:
+
+\`\`\`mermaid
+sequenceDiagram
+    participant Writer
+    participant Reviewer
+    Writer->>Reviewer: Send the draft
+    Note over Writer,Reviewer: Check the content and page layout
+    alt Changes needed
+        Reviewer-->>Writer: Return comments
+        Writer->>Reviewer: Send the revised draft
+    else Ready to share
+        Reviewer-->>Writer: Approve the document
+    end
+\`\`\`
+
+<div class="page-break"></div>
+
+### State diagram: track a document
+
+States describe where a document is now and which transitions are possible:
+
+\`\`\`mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> InReview: Submit
+    InReview --> Draft: Request changes
+    InReview --> Approved: Accept
+    Approved --> Archived: Store a copy
+    Archived --> [*]
+\`\`\`
+
+### Class diagram: describe a small model
+
+Show the relationship between a folder and the documents it contains:
+
+\`\`\`mermaid
+classDiagram
+    class Folder {
+        +String name
+        +addDocument()
+    }
+    class Document {
+        +String title
+        +String markdown
+        +exportPDF()
+    }
+    Folder "1" o-- "0..*" Document : contains
+\`\`\`
+
+## Bring in an image
+
+In Visual mode, paste or drop a raster image, or use the image control. Imported
+images are kept in the browser library or your selected disk folder. For an existing Markdown file,
+open its matching image files too so relative image references can be resolved.
+SVG uploads are not supported.
+
+## Make the page your own
+
+Choose a **Document style** for a starting point, then edit the CSS to adjust
+fonts, colors, spacing, and borders. **Import CSS** loads a stylesheet from disk.
+The interface theme and the printed document style are independent.
+
+Set the paper size, orientation, and margins before your final review. Smart
+pagination tries to keep headings with their content and split longer tables
+into readable groups, repeating table headers across pages. Use **Page break**
+when a section should start on a new page.
+
+The automatic scale range limits fitting reductions to preserve readability.
+Edit the limits to use a custom range. If a diagram, image, or other indivisible
+block still cannot fit, adjust its size, the CSS, or the paper settings; the app
+reports the overflow and disables its print button until the layout fits.
+
+## Keep your work and share a copy
+
+Open the document library to create documents and nested folders. Select an item
+to rename, duplicate, move, or delete it. Deleting a folder also removes its
+contents after confirmation; there is no trash folder for recovery.
+
+Edits, document CSS, paper settings, and imported images save locally in this
+browser's IndexedDB database by default. **Save** or
+**Ctrl/Cmd+S** also saves explicitly. Clearing site data removes the local library,
+so export important work regularly.
+
+On desktop Chrome or Edge, **Open local folder…** lets you keep documents on disk.
+Grant folder access to save Markdown files directly there. **Copy library to empty
+folder…** copies your browser library and images; **Use browser library** returns to
+the original browser copy. Keep the folder's companion file, \`.md-pdf.json\`,
+with your documents to preserve styles and paper settings.
+
+The browser may ask you to **Reconnect folder** in a later session. If a file changes
+outside the app, saving stops so you can export your unsaved Markdown and **Reload
+folder from disk**. Deleting library items in folder mode removes their disk copies;
+unrelated files and images are preserved.
+
+- **Open files** imports Markdown or text files. Include matching raster images
+  when your Markdown refers to local image filenames.
+- **Export Markdown** downloads the source text. It does not bundle styles or images.
+- **Print / Save PDF** opens the browser print dialog. Choose the matching paper
+  size, use 100% scale, and turn off browser headers and footers.
+
+Files brought in through **Open files** are imported copies. In browser storage,
+editing them does not update the originals; folder mode saves them in the selected folder.
+There is no account, cloud synchronization, or publishing service. The library is
+specific to this browser and site; disk folders can be reopened wherever you have access.
+Remote images or resources referenced by your CSS can still make network requests.
+
+---
+
+Ready for a fresh page? Create a document in the library, or select this text and
+start writing. Your next report, handout, or set of notes can begin right here.
+`;

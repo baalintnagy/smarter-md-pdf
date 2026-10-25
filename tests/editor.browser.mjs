@@ -1,4 +1,5 @@
 import { pathToFileURL } from 'node:url';
+import { positionFromZoom } from '../src/zoom-scale.js';
 import { mkdir, readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { server } from '../scripts/serve.mjs';
@@ -39,9 +40,11 @@ try {
     const original = await page.locator('#markdown').inputValue();
     const toolbar = page.getByRole('toolbar', { name: 'Document formatting' });
     const toolbarHeight = (await toolbar.boundingBox()).height;
-    for (const zoom of [50, 100, 150, 200, 300]) {
+    for (const zoom of [50, 100, 150, 200, 250]) {
         await setSource('ABCDEFGHIJKLM');
-        await page.getByRole('slider', { name: 'Markdown zoom', exact: true }).fill(String(zoom));
+        await page
+            .getByRole('slider', { name: 'Markdown zoom', exact: true })
+            .fill(String(positionFromZoom(zoom, 20, 250)));
         const point = await rich
             .locator('p')
             .first()
@@ -69,13 +72,24 @@ try {
             'Editable surface is untransformed',
         );
     }
-    await page.getByRole('slider', { name: 'Markdown zoom', exact: true }).fill('100');
+    await page
+        .getByRole('slider', { name: 'Markdown zoom', exact: true })
+        .fill(String(positionFromZoom(100, 20, 250)));
     await setSource(original);
     await rich.locator('h1').first().click();
     await page.keyboard.press('End');
     await page.keyboard.type(' edited');
     await ready();
     assert.ok((await page.locator('#markdown').inputValue()).includes('edited'));
+    const editedSource = await page.locator('#markdown').inputValue();
+    const mathBlocks = (source) =>
+        [...source.matchAll(/\$\$\s*\n([\s\S]*?)\n\$\$/g)].map((match) => match[1]);
+    assert.deepEqual(
+        mathBlocks(editedSource),
+        mathBlocks(original),
+        'Unrelated edits preserve TeX',
+    );
+    assert.equal(await preview.locator('.render-error').count(), 0);
     assert.ok((await preview.locator('h1').first().textContent()).includes('edited'));
     await rich.locator('p').first().click();
     await rich
@@ -276,7 +290,7 @@ try {
     await page.screenshot({ path: 'test-results/visual-editor.png', fullPage: true });
     await page.locator('#theme').click();
     await page.waitForFunction(
-        () => getComputedStyle(document.body).backgroundColor === 'rgb(21, 30, 45)',
+        () => getComputedStyle(document.body).backgroundColor === 'rgb(22, 29, 41)',
     );
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(

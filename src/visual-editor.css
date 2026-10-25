@@ -4,6 +4,11 @@
     margin: 14px 0 8px;
     flex-wrap: wrap;
 }
+.preserved-math {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: var(--editor-font);
+}
 .editor-modes button {
     font-size: 11px;
     padding: 7px 12px;

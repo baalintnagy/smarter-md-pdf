@@ -1,9 +1,12 @@
 import { initializePanelZoom } from './panel-zoom.js';
-import { installMathStyles, renderPrintExtensions } from './print-extensions.js';
+import { renderPrintExtensions } from './print-extensions.js';
 import { PRESETS, validateSettings } from './settings.js';
 import { MarkdownRenderer } from './markdown.js';
 import { Paginator } from './paginator.js';
-import { DOCUMENT_CSS } from './document-style.js';
+import { initializePreviewFrame, updatePreviewZoom } from './preview-frame.js';
+import { waitForImages } from './preview-images.js';
+import { initializeTheme } from './theme.js';
+import { resolveEditorImage } from './image-assets.js';
 import { FileLibrary } from './files.js';
 import { SAMPLE } from './sample.js';
 import { EditorController } from './editor-controller.js';
@@ -29,31 +32,13 @@ let importing = false;
 let documentLibrary;
 let syncPreviewZoom;
 
-function setTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    $('theme').title = `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`;
-    $('theme').setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
-    try {
-        localStorage.setItem('smarter-theme', theme);
-    } catch {
-        /* Storage is optional. */
-    }
+initializeTheme($('theme'), () => {
     if (previewDocument) {
         previewDocument.documentElement.style.backgroundColor = getComputedStyle(
             document.documentElement,
         ).getPropertyValue('--canvas');
     }
-}
-let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-try {
-    theme = localStorage.getItem('smarter-theme') || theme;
-} catch {
-    /* Use OS preference. */
-}
-setTheme(theme);
-$('theme').addEventListener('click', () =>
-    setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'),
-);
+});
 
 function settings() {
     const scaleMode = $('scale-mode').value;
@@ -65,6 +50,7 @@ function settings() {
         maxScale: scaleMode === 'auto' ? 100 : $('max-scale').valueAsNumber,
         scaleMode,
         smart: $('smart').checked,
+        minTableRows: $('table-min-rows').valueAsNumber,
     });
 }
 function status(message, error = false) {
@@ -79,46 +65,6 @@ function schedule() {
     status('Updating pages…');
     clearTimeout(timer);
     timer = setTimeout(render, 220);
-}
-async function waitForImages(root) {
-    let failures = 0;
-    await Promise.all(
-        [...root.querySelectorAll('img')].map(
-            (image) =>
-                new Promise((resolve) => {
-                    let finished = false;
-                    const done = (failed) => {
-                        if (finished) {
-                            return;
-                        }
-                        finished = true;
-                        clearTimeout(timeout);
-                        if (failed) {
-                            failures++;
-                        } else {
-                            image.width = image.naturalWidth;
-                            image.height = image.naturalHeight;
-                        }
-                        image.removeEventListener('load', loaded);
-                        image.removeEventListener('error', errored);
-                        resolve();
-                    };
-                    const loaded = () => done(false);
-                    const errored = () => done(true);
-                    const timeout = setTimeout(() => {
-                        image.removeAttribute('src');
-                        done(true);
-                    }, 5000);
-                    if (image.complete) {
-                        done(!image.naturalWidth);
-                    } else {
-                        image.addEventListener('load', loaded);
-                        image.addEventListener('error', errored);
-                    }
-                }),
-        ),
-    );
-    return failures;
 }
 async function render() {
     if (!previewDocument || importing) {
@@ -140,7 +86,7 @@ async function render() {
         const { fragment, missingImages } = renderer.render(
             $('markdown').value,
             doc,
-            library.assets,
+            documentLibrary?.imageAssets() || library.assets,
         );
         // Measure in the frame, after fonts and local/remote images settle.
         const staging = doc.getElementById('staging');
@@ -160,7 +106,7 @@ async function render() {
             $('max-scale').value = result.scaleRange.maxScale;
         }
         $('scale-help').textContent =
-            `${options.scaleMode === 'auto' ? 'Calculated readable range' : 'Custom range'}: ${result.scaleRange.minScale}–${result.scaleRange.maxScale}%. Selected blocks shrink only when needed. Tables split with at least 3 rows per fragment when space permits.`;
+            `${options.scaleMode === 'auto' ? 'Calculated readable range' : 'Custom range'}: ${result.scaleRange.minScale}–${result.scaleRange.maxScale}%. Selected blocks shrink only when needed.`;
         await waitForImages(doc.getElementById('pages'));
         if (version !== revision) {
             return;
@@ -199,44 +145,11 @@ async function render() {
 }
 
 function updateZoom() {
-    if (!pages.length) {
-        return;
-    }
-    const available = Math.max(100, frame.clientWidth - 48);
-    const pageWidth = pages[0].sheet.offsetWidth;
-    const scale =
-        $('zoom').value === 'fit' ? Math.min(1, available / pageWidth) : Number($('zoom').value);
-    syncPreviewZoom?.(scale);
-    for (const page of pages) {
-        page.sheet.style.transformOrigin = 'top left';
-        page.sheet.style.transform = `scale(${scale})`;
-        page.slot.style.width = `${page.sheet.offsetWidth * scale}px`;
-        page.slot.style.height = `${page.sheet.offsetHeight * scale + 24}px`;
-        page.slot.querySelector('.page-caption').style.cssText =
-            `position:absolute;top:${page.sheet.offsetHeight * scale}px;width:100%`;
-    }
+    updatePreviewZoom(frame, pages, $('zoom').value, syncPreviewZoom);
 }
 
 frame.addEventListener('load', () => {
-    previewDocument = frame.contentDocument;
-    previewDocument.documentElement.style.cssText = `background-color:${getComputedStyle(document.documentElement).getPropertyValue('--canvas')};transition:background-color 800ms ease;`;
-    const base = previewDocument.createElement('style');
-    base.textContent = DOCUMENT_CSS;
-    previewDocument.head.append(base);
-    installMathStyles(previewDocument);
-    for (const id of ['custom-style', 'print-style']) {
-        const style = previewDocument.createElement('style');
-        style.id = id;
-        previewDocument.head.append(style);
-    }
-    const staging = previewDocument.createElement('div');
-    staging.id = 'staging';
-    staging.className = 'document';
-    staging.style.cssText = 'position:absolute;left:-100000px;top:0;visibility:hidden;';
-    previewDocument.body.append(staging);
-    const root = previewDocument.createElement('div');
-    root.id = 'pages';
-    previewDocument.body.append(root);
+    previewDocument = initializePreviewFrame(frame);
     render();
 });
 frame.srcdoc =
@@ -245,6 +158,7 @@ frame.srcdoc =
 $('markdown').value = SAMPLE;
 $('css').value = DEFAULT_TEMPLATE.css;
 $('filename').textContent = activeDocument.name;
+$('filename').title = activeDocument.name;
 for (const template of [...CSS_TEMPLATES, { id: 'custom', name: 'Custom CSS' }]) {
     const option = document.createElement('option');
     option.value = template.id;
@@ -274,27 +188,12 @@ const editor = new EditorController({
         if (!file.type.startsWith('image/') || /svg/i.test(file.type)) {
             throw new Error('Choose a raster image such as PNG, JPEG, or WebP.');
         }
-        await library.import([file]);
+        await library.import([file], documentLibrary.assetPrefix());
         schedule();
         return file.name;
     },
-    resolveImage: (url) => {
-        let key = url;
-        try {
-            key = decodeURIComponent(url).replace(/^\.\//, '');
-        } catch {
-            /* Retain the original path. */
-        }
-        const asset = library.assets.get(key) || library.assets.get(key.split('/').at(-1));
-        if (asset) {
-            return asset;
-        }
-        try {
-            return ['https:', 'http:'].includes(new URL(url).protocol) ? url : '';
-        } catch {
-            return '';
-        }
-    },
+    resolveImage: (url) =>
+        resolveEditorImage(url, documentLibrary?.imageAssets() || library.assets),
 });
 const savedFields = [
     'preset',
@@ -306,7 +205,7 @@ const savedFields = [
     'max-scale',
     'smart',
     'scale-mode',
-    'zoom',
+    'table-min-rows',
 ];
 const captureDocument = () => ({
     source: $('markdown').value,
@@ -335,6 +234,7 @@ documentLibrary = new DocumentLibrary({
     },
     onOpen: (file) => {
         activeDocument = file;
+        $('table-min-rows').value = file.settings?.['table-min-rows'] ?? 3;
         editor.setSource(file.source);
         $('css').value = file.css ?? DEFAULT_TEMPLATE.css;
         $('css-template').value = CSS_TEMPLATES.some((template) => template.id === file.template)
@@ -350,6 +250,7 @@ documentLibrary = new DocumentLibrary({
             }
         }
         $('filename').textContent = file.name;
+        $('filename').title = file.name;
         const importedIndex = library.documents.findIndex((item) => item.id === file.id);
         $('documents').value = importedIndex < 0 ? '' : String(importedIndex);
         schedule();
@@ -365,6 +266,7 @@ for (const id of [
     'max-scale',
     'smart',
     'scale-mode',
+    'table-min-rows',
 ]) {
     $(id).addEventListener('input', () => {
         if (['width', 'height'].includes(id)) {
@@ -409,7 +311,10 @@ async function importFiles(files) {
     try {
         await documentLibrary.initialized;
         activeDocument.source = $('markdown').value;
-        const imported = await library.import(files);
+        const imported = await library.import(
+            files,
+            documentLibrary.assetPrefix(documentLibrary.destination()),
+        );
         for (const item of imported) {
             const saved = documentLibrary.model.create(
                 'document',

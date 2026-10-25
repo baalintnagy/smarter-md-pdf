@@ -128,14 +128,18 @@ export class Paginator {
             probe.remove();
             return measured;
         };
-        const splitCollection = (container, group, count, parts) => {
+        const splitCollection = (container, group, count, parts, minimumCount = 3) => {
             if (count < 2) {
                 return null;
             }
             const before = [...page.content.childNodes].slice(0, -group.length);
             const fresh = before.length === 0;
-            // Three rows/items per side; relax only if a fresh page cannot satisfy that minimum.
-            const rowFloors = settings.smart ? (fresh ? [3, 2, 1] : [3]) : [1];
+            // Relax the configured minimum only when a fresh page cannot accommodate it.
+            const rowFloors = settings.smart
+                ? fresh
+                    ? Array.from({ length: minimumCount }, (_, index) => minimumCount - index)
+                    : [minimumCount]
+                : [1];
             for (const rowFloor of rowFloors) {
                 if (count < rowFloor * 2) {
                     continue;
@@ -231,6 +235,7 @@ export class Paginator {
                     group,
                     this.tableRows(tail).length,
                     (table, cut) => this.tableParts(table, cut),
+                    settings.minTableRows ?? 3,
                 );
                 if (rest) {
                     queue.unshift(rest);
@@ -296,7 +301,7 @@ export class Paginator {
             item.minScale = scales.length ? Math.min(range.maxScale, ...scales) : range.maxScale;
             const caption = doc.createElement('div');
             caption.className = 'page-caption';
-            caption.textContent = `PAGE ${index + 1} / ${pages.length} · ${range.maxScale}%${item.minScale < range.maxScale ? ` · selected blocks ${item.minScale}–${range.maxScale}%` : ''}`;
+            caption.textContent = `PAGE ${index + 1} / ${pages.length} · ${item.minScale < range.maxScale ? `${item.minScale}–${range.maxScale}%` : `${range.maxScale}%`}`;
             item.slot.append(caption);
         });
         return { pages, warnings: [...warnings], scaleRange: range };

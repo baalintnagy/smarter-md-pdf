@@ -1,5 +1,7 @@
+import { imageAssetKey, findImageAsset } from './image-assets.js';
 import { Marked } from '../vendor/marked.esm.js';
 import { highlightCode } from './code-highlighting.js';
+import { inlineAsciiMath } from './asciimath.js';
 
 // Tokens preserve TeX backslashes before ordinary Markdown escaping takes place.
 const escapeHTML = (value) =>
@@ -18,11 +20,21 @@ const mathToken = (name, level, pattern, start) => ({
         }
     },
     renderer(token) {
-        return `<${level === 'block' ? 'div' : 'span'} class="math-source${level === 'block' ? ' math-display' : ''}">${escapeHTML(token.text)}</${level === 'block' ? 'div' : 'span'}>`;
+        const tag = level === 'block' ? 'div' : 'span';
+        const className = level === 'block' ? 'math-source math-display' : 'math-source';
+        return `<${tag} class="${className}">${escapeHTML(token.text)}</${tag}>`;
     },
 });
 const marked = new Marked({
     extensions: [
+        {
+            name: 'inlineAsciiMath',
+            level: 'inline',
+            start: (source) => source.indexOf('@{'),
+            tokenizer: inlineAsciiMath,
+            renderer: (token) =>
+                `<span class="math-source asciimath-source">${escapeHTML(token.text)}</span>`,
+        },
         mathToken(
             'displayMath',
             'block',
@@ -114,13 +126,8 @@ export class MarkdownRenderer {
                 }
                 if (node.tagName === 'IMG') {
                     const original = node.getAttribute('src') || '';
-                    let key = original;
-                    try {
-                        key = decodeURIComponent(original).replace(/^\.\//, '');
-                    } catch {
-                        /* Keep malformed paths as visible missing images. */
-                    }
-                    const src = assets.get(key) || assets.get(key.split('/').at(-1)) || original;
+                    const key = imageAssetKey(original);
+                    const src = findImageAsset(assets, key) || original;
                     if (
                         safeURL(src, true) &&
                         (!src.startsWith('blob:') || [...assets.values()].includes(src))

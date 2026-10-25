@@ -25,16 +25,44 @@ const nameAction = async (actionName, name) => {
     await page.locator('#library-name').fill(name);
     await page.locator('#library-submit').click();
 };
-const open = (name) => page.getByRole('button', { name: `Open ${name}`, exact: true }).click();
+const open = (name) => page.getByRole('row', { name: `Open ${name}`, exact: true }).click();
 const folder = (name) =>
-    page.getByRole('button', { name: `Select folder ${name}`, exact: true }).click();
+    page.getByRole('row', { name: `Select folder ${name}`, exact: true }).click();
 try {
     await page.goto(url);
     await saved(page);
     await ready(page);
     assert.equal(await page.locator('#library-panel').isVisible(), false);
     await page.locator('#library-toggle').click();
+    const root = page.getByRole('row', { name: 'Root', exact: true });
+    await root.locator('.wb-expander').click();
+    await page
+        .getByRole('row', { name: 'Open example.md', exact: true })
+        .waitFor({ state: 'hidden' });
+    await root.locator('.wb-expander').click();
+    await root.click();
+    await page.getByRole('row', { name: 'Open example.md', exact: true }).waitFor();
+    assert.equal(await page.locator('[data-library-action="delete"]').isDisabled(), true);
+    assert.equal(await page.locator('#export-markdown').isDisabled(), true);
+    await page.locator('#library-tree').press('ArrowLeft');
+    await page.waitForFunction(
+        () => document.querySelector('.library-root')?.getAttribute('aria-expanded') === 'false',
+    );
+    assert.equal(await root.getAttribute('aria-expanded'), 'false');
+    await page.locator('#library-tree').press('ArrowRight');
+    await page.waitForFunction(
+        () => document.querySelector('.library-root')?.getAttribute('aria-expanded') === 'true',
+    );
+    assert.equal(await root.getAttribute('aria-expanded'), 'true');
+    await page.locator('#library-tree').press('ArrowDown');
+    await page.waitForFunction(
+        () =>
+            document.querySelector('.wb-row.wb-active')?.getAttribute('aria-label') ===
+            'Open example.md',
+    );
+    await root.click();
     await nameAction('new-folder', 'Projects');
+    assert.equal(await page.locator('#export-markdown').isDisabled(), true);
     await nameAction('new-folder', 'Notes');
     await nameAction('new-document', 'Plan.md');
     await page.locator('#mode-markdown').click();
@@ -56,17 +84,55 @@ try {
     await action('move');
     await page.locator('#library-destination').selectOption({ label: 'Projects' });
     await page.locator('#library-submit').click();
-    assert.equal(await page.locator('#library-selection').textContent(), 'Projects / Roadmap.md');
-    const row = page
-        .locator('.library-row')
-        .filter({ has: page.getByRole('button', { name: 'Open Roadmap.md', exact: true }) });
-    await row.dragTo(page.locator('#library-root'));
+    assert.equal(
+        await page.locator('.wb-row.wb-active .wb-title').getAttribute('title'),
+        'Projects / Roadmap.md',
+    );
+    const row = page.getByRole('row', { name: 'Open Roadmap.md', exact: true });
+    await row.dragTo(page.locator('#library-tree'), {
+        targetPosition: {
+            x: 10,
+            y: (await page.locator('#library-tree').boundingBox()).height - 5,
+        },
+    });
     await saved(page);
     assert.equal(
-        await page.locator('#library-selection').textContent(),
+        await page.locator('.wb-row.wb-active .wb-title').getAttribute('title'),
         'Roadmap.md',
         'Drag to root updates parent',
     );
+    assert.equal(await page.locator('#export-markdown').isEnabled(), true);
+    assert.equal(await row.locator('.wb-icon.bi-file-earmark').count(), 1);
+    assert.equal(await row.locator('.tree-line-branch.tree-line-last').count(), 1);
+    assert.equal(
+        await row
+            .locator('.tree-line-branch')
+            .evaluate((node) => getComputedStyle(node, '::after').pointerEvents),
+        'none',
+        'Tree lines do not intercept clicks or dragging',
+    );
+    assert.equal(await root.locator('.wb-icon.bi-folder2-open').count(), 1);
+    const projects = page.getByRole('row', { name: 'Select folder Projects', exact: true });
+    await row.dragTo(projects);
+    await page.waitForFunction(
+        () =>
+            document.querySelector('.wb-row.wb-active .wb-title')?.title ===
+            'Projects / Roadmap.md',
+    );
+    await row.dragTo(root);
+    await page.waitForFunction(
+        () => document.querySelector('.wb-row.wb-active .wb-title')?.title === 'Roadmap.md',
+    );
+    await mkdir('test-results', { recursive: true });
+    await page
+        .locator('#library-panel')
+        .screenshot({ path: 'test-results/library-tree-light.png', animations: 'disabled' });
+    await page.locator('#theme').click();
+    await page.locator('#library-panel').screenshot({
+        path: 'test-results/library-tree-dark.png',
+        animations: 'disabled',
+    });
+    await page.locator('#theme').click();
     const png =
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aXioAAAAASUVORK5CYII=';
     await page.locator('#markdown').fill('# With local image\n\n![dot](photo.png)');
@@ -109,29 +175,34 @@ try {
     await page.locator('#library-toggle').click();
     await folder('Projects');
     await action('duplicate');
-    assert.equal(await page.locator('#library-selection').textContent(), 'Projects copy');
-    const copied = page
-        .getByRole('button', { name: 'Select folder Projects copy', exact: true })
-        .locator('xpath=ancestor::li[1]');
+    assert.equal(
+        await page.locator('.wb-row.wb-active .wb-title').getAttribute('title'),
+        'Projects copy',
+    );
+    await folder('Projects copy');
+    const copiedFolder = page.getByRole('row', {
+        name: 'Select folder Projects copy',
+        exact: true,
+    });
+    if ((await copiedFolder.getAttribute('aria-expanded')) === 'false') {
+        await copiedFolder.locator('.wb-expander').click();
+    }
+    await page.locator('.wb-title[title="Projects copy / Notes / Roadmap copy.md"]').waitFor();
     assert.ok(
-        await copied.getByRole('button', { name: 'Open Roadmap copy.md', exact: true }).count(),
+        await page.getByRole('row', { name: 'Open Roadmap copy.md', exact: true }).count(),
         'Folder duplication includes descendants',
     );
     await action('delete');
     await page.locator('#library-cancel').click();
     assert.ok(
-        await page
-            .getByRole('button', { name: 'Select folder Projects copy', exact: true })
-            .count(),
+        await page.getByRole('row', { name: 'Select folder Projects copy', exact: true }).count(),
         'Delete can be cancelled',
     );
     await action('delete');
     await page.locator('#library-submit').click();
     await saved(page);
     assert.equal(
-        await page
-            .getByRole('button', { name: 'Select folder Projects copy', exact: true })
-            .count(),
+        await page.getByRole('row', { name: 'Select folder Projects copy', exact: true }).count(),
         0,
     );
     await folder('Projects');
@@ -139,7 +210,7 @@ try {
     await page.locator('#library-submit').click();
     await saved(page);
     assert.equal(
-        await page.getByRole('button', { name: 'Open Roadmap copy.md', exact: true }).count(),
+        await page.getByRole('row', { name: 'Open Roadmap copy.md', exact: true }).count(),
         0,
         'Folder deletion removes nested documents',
     );
@@ -148,6 +219,7 @@ try {
         'Roadmap.md',
         'Deleting another folder keeps the open document',
     );
+    await open('Roadmap.md');
     const download = page.waitForEvent('download');
     await page.locator('#export-markdown').click();
     const file = await download;
@@ -162,14 +234,16 @@ try {
     await ready(page);
     assert.equal(await page.locator('#filename').textContent(), 'example.md');
     assert.ok(
-        (await page.locator('#markdown').inputValue()).includes('Welcome to MD-Office!'),
+        (await page.locator('#markdown').inputValue()).includes(
+            'From a rough note to a finished page',
+        ),
         'Deleting active file does not overwrite the fallback document',
     );
     await page.reload();
     await saved(page);
     await page.locator('#library-toggle').click();
     assert.equal(
-        await page.getByRole('button', { name: 'Open Roadmap.md', exact: true }).count(),
+        await page.getByRole('row', { name: 'Open Roadmap.md', exact: true }).count(),
         0,
         'Deletion persists',
     );
