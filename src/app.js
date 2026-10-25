@@ -15,6 +15,7 @@ import { HighlightedSource } from './code-highlighting.js';
 import './code-editors.css';
 import { initializeColumnSplitter } from './column-splitter.js';
 import { DocumentLibrary } from './document-library.js';
+import { DEFAULT_PAGE_NUMBER_FORMAT } from './page-numbers.js';
 
 const $ = (id) => document.getElementById(id);
 const frame = $('preview');
@@ -51,6 +52,8 @@ function settings() {
         scaleMode,
         smart: $('smart').checked,
         minTableRows: $('table-min-rows').valueAsNumber,
+        pageNumbers: $('page-numbers').checked,
+        pageNumberFormat: $('page-number-format').value,
     });
 }
 function status(message, error = false) {
@@ -206,13 +209,15 @@ const savedFields = [
     'smart',
     'scale-mode',
     'table-min-rows',
+    'page-numbers',
+    'page-number-format',
 ];
 const captureDocument = () => ({
     source: $('markdown').value,
     css: $('css').value,
     template: $('css-template').value,
     settings: Object.fromEntries(
-        savedFields.map((id) => [id, id === 'smart' ? $(id).checked : $(id).value]),
+        savedFields.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]),
     ),
 });
 documentLibrary = new DocumentLibrary({
@@ -235,6 +240,9 @@ documentLibrary = new DocumentLibrary({
     onOpen: (file) => {
         activeDocument = file;
         $('table-min-rows').value = file.settings?.['table-min-rows'] ?? 3;
+        $('page-numbers').checked = file.settings?.['page-numbers'] ?? false;
+        $('page-number-format').value =
+            file.settings?.['page-number-format'] ?? DEFAULT_PAGE_NUMBER_FORMAT;
         editor.setSource(file.source);
         $('css').value = file.css ?? DEFAULT_TEMPLATE.css;
         $('css-template').value = CSS_TEMPLATES.some((template) => template.id === file.template)
@@ -242,13 +250,14 @@ documentLibrary = new DocumentLibrary({
             : 'custom';
         for (const [id, value] of Object.entries(file.settings || {})) {
             if (savedFields.includes(id)) {
-                if (id === 'smart') {
+                if ($(id).type === 'checkbox') {
                     $(id).checked = value;
                 } else {
                     $(id).value = value;
                 }
             }
         }
+        $('page-number-format').disabled = !$('page-numbers').checked;
         $('filename').textContent = file.name;
         $('filename').title = file.name;
         const importedIndex = library.documents.findIndex((item) => item.id === file.id);
@@ -267,8 +276,13 @@ for (const id of [
     'smart',
     'scale-mode',
     'table-min-rows',
+    'page-numbers',
+    'page-number-format',
 ]) {
     $(id).addEventListener('input', () => {
+        if (id === 'page-numbers') {
+            $('page-number-format').disabled = !$('page-numbers').checked;
+        }
         if (['width', 'height'].includes(id)) {
             $('preset').value = 'Custom';
         }

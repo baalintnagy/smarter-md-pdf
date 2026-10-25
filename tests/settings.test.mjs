@@ -30,3 +30,16 @@ test('rejects impossible or incomplete layouts', () => {
 test('accepts a configurable minimum table fragment size', () => {
     assert.equal(validateSettings({ ...valid, minTableRows: 5 }).minTableRows, 5);
 });
+
+test('enabled page numbers require a nonempty bounded format', () => {
+    for (const pageNumberFormat of ['', '   ', 'x'.repeat(201), 12]) {
+        assert.throws(() => validateSettings({ ...valid, pageNumbers: true, pageNumberFormat }));
+    }
+    assert.doesNotThrow(() => validateSettings({ ...valid, pageNumbers: true }));
+    assert.doesNotThrow(() =>
+        validateSettings({ ...valid, pageNumbers: false, pageNumberFormat: '' }),
+    );
+    assert.doesNotThrow(() =>
+        validateSettings({ ...valid, pageNumbers: true, pageNumberFormat: '{page}' }),
+    );
+});

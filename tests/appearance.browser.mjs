@@ -20,10 +20,65 @@ const source = async (value) => {
     await page.locator('#markdown').fill(value);
     await ready();
 };
+async function checkPageNumbers() {
+    assert.equal(await preview.locator('.sheet .page-number').count(), 0);
+    assert.equal(await page.locator('#page-number-format').isDisabled(), true);
+    await page.getByRole('switch', { name: 'Generate page numbers' }).check();
+    await page.locator('#page-number-format').fill('Page {page} of {pages}');
+    await ready();
+    const numberedPages = await preview.locator('.sheet').count();
+    assert.deepEqual(
+        await preview.locator('.sheet .page-number').allTextContents(),
+        Array.from(
+            { length: numberedPages },
+            (_, index) => `Page ${index + 1} of ${numberedPages}`,
+        ),
+    );
+    const originalMargin = await page.locator('#margin').inputValue();
+    await page.locator('#margin').fill('0');
+    await ready();
+    assert.ok(
+        await preview
+            .locator('.sheet')
+            .evaluateAll((sheets) =>
+                sheets.every(
+                    (sheet) =>
+                        sheet.querySelector('.document').getBoundingClientRect().bottom <=
+                        sheet.querySelector('.page-number').getBoundingClientRect().top,
+                ),
+            ),
+        'Numbered footers have space even with zero page margins',
+    );
+    await page.locator('#margin').fill(originalMargin);
+    await ready();
+    await page.locator('#page-number-format').fill('<b>{page}</b> / {pages}');
+    await ready();
+    assert.equal(await preview.locator('.page-number b').count(), 0);
+    assert.equal(
+        await preview.locator('.page-number').first().textContent(),
+        `<b>1</b> / ${numberedPages}`,
+    );
+    await page.locator('#page-number-format').fill('Page {page} of {pages}');
+    await page.waitForFunction(
+        () => document.getElementById('save-state').textContent === 'Saved on this device',
+    );
+    await page.reload();
+    await page.locator('#visual-editor[data-state=ready]').waitFor();
+    await ready();
+    assert.equal(await page.locator('#page-numbers').isChecked(), true);
+    assert.equal(await page.locator('#page-number-format').inputValue(), 'Page {page} of {pages}');
+    assert.equal(await page.locator('#page-number-format').isDisabled(), false);
+    await page.locator('#page-numbers').uncheck();
+    await ready();
+    assert.equal(await preview.locator('.page-number').count(), 0);
+    assert.equal(await page.locator('#page-number-format').isDisabled(), true);
+    await page.evaluate(() => window.scrollTo(0, 0));
+}
 try {
     await page.goto(`http://127.0.0.1:${process.env.PORT || 4173}${process.env.SITE_BASE || ''}/`);
     await page.locator('#visual-editor[data-state=ready]').waitFor();
     await ready();
+    await checkPageNumbers();
     assert.equal(
         await page
             .locator('.app-header')

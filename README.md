@@ -119,6 +119,11 @@ source with a warning. No additional CDN or MathJax runtime is needed.
 
 ## Printing
 
+Enable **Generate page numbers** in Page setup to add centered footers to the PDF.
+The format uses `{page}` for the current page and `{pages}` for the total, such as
+`Page {page} of {pages}`. Numbering is off by default; the checkbox and format are
+saved per document. Keep the browser's own print headers and footers disabled.
+
 Choose A3, A4, A5, Letter, Legal, Tabloid, or numeric custom dimensions in millimetres. Orientation swaps dimensions. Margins apply on every page. Smart pagination measures the rendered DOM and keeps heading chains with actual following content, including the first fragment of a long table or paragraph. Tables use available space on the current page before starting another page and repeat their header. **Minimum rows per table fragment** sets how many data rows to keep on both sides of a split (1–100, default 3), and is saved per document. Only when a fresh page physically cannot accommodate that constraint is the minimum relaxed. Small tables move intact when possible; rows are never split as arbitrary text.
 
 Compact subsections (a heading and following content up to the next heading or manual break, at most one-third of a printable page) stay together if they cannot fit at the page bottom. Longer lists split by measured item groups, keeping at least three items on both sides when physically possible, with ordered-list numbering preserved. This avoids a subsection heading stranded with just one or two bullets while still letting larger sections use remaining page space.

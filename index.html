@@ -571,6 +571,26 @@
                         </div>
                         <div class="divider"></div>
                         <div class="toggle-row">
+                            <label for="page-numbers"
+                                ><strong>Generate page numbers</strong
+                                ><span>Add a footer to each printed page.</span></label
+                            ><input id="page-numbers" type="checkbox" role="switch" />
+                        </div>
+                        <label for="page-number-format">Page number format</label>
+                        <input
+                            id="page-number-format"
+                            type="text"
+                            value="{page} / {pages}"
+                            maxlength="200"
+                            aria-describedby="page-number-help"
+                            disabled
+                        />
+                        <p id="page-number-help" class="help">
+                            Use {page} for the current page and {pages} for the total. Example: Page
+                            {page} of {pages}.
+                        </p>
+                        <div class="divider" role="separator"></div>
+                        <div class="toggle-row">
                             <label for="smart"
                                 ><strong>Smart page breaks</strong
                                 ><span>Keep headings and content together.</span></label

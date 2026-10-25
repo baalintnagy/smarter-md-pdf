@@ -1,4 +1,5 @@
 import { automaticScaleRange, readableFloor } from './scaling.js';
+import { DEFAULT_PAGE_NUMBER_FORMAT, formatPageNumber } from './page-numbers.js';
 
 const MM = 96 / 25.4;
 const heading = (node) => /^H[1-6]$/.test(node?.tagName);
@@ -35,7 +36,8 @@ export class Paginator {
         probe.replaceChildren();
         probe.remove();
         const width = (settings.width - 2 * settings.margin) * MM;
-        const height = (settings.height - 2 * settings.margin) * MM;
+        const footerSpace = settings.pageNumbers ? Math.max(0, 12 - settings.margin) : 0;
+        const height = (settings.height - 2 * settings.margin - footerSpace) * MM;
         const base = range.maxScale / 100;
         const pages = [];
         const warnings = new Set();
@@ -295,6 +297,16 @@ export class Paginator {
             pages.pop().slot.remove();
         }
         pages.forEach((item, index) => {
+            if (settings.pageNumbers) {
+                const number = doc.createElement('div');
+                number.className = 'page-number';
+                number.textContent = formatPageNumber(
+                    settings.pageNumberFormat ?? DEFAULT_PAGE_NUMBER_FORMAT,
+                    index + 1,
+                    pages.length,
+                );
+                item.sheet.append(number);
+            }
             const scales = [...item.content.querySelectorAll('[data-layout-scale]')].map((node) =>
                 Number(node.dataset.layoutScale),
             );

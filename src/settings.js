@@ -1,3 +1,5 @@
+import { DEFAULT_PAGE_NUMBER_FORMAT } from './page-numbers.js';
+
 export const PRESETS = Object.freeze({
     A4: [210, 297],
     A3: [297, 420],
@@ -25,6 +27,13 @@ export function validateSettings(settings) {
         throw new Error(
             'Minimum rows per table fragment must be a whole number between 1 and 100.',
         );
+    }
+    const format = settings.pageNumberFormat ?? DEFAULT_PAGE_NUMBER_FORMAT;
+    if (
+        settings.pageNumbers &&
+        (typeof format !== 'string' || !format.trim() || format.length > 200)
+    ) {
+        throw new Error('Enter a page number format between 1 and 200 characters.');
     }
     return settings;
 }

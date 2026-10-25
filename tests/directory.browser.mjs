@@ -166,17 +166,26 @@ try {
     await page.locator('#markdown').fill('# Saved on disk');
     await page.locator('#css-template').selectOption('ocean');
     await page.locator('#table-min-rows').fill('5');
+    await page.locator('#page-numbers').check();
+    await page.locator('#page-number-format').fill('Page {page} of {pages}');
     await page.keyboard.press('Control+s');
     await folderSaved();
     assert.equal(await diskFile('example.md'), '# Saved on disk');
     const metadata = JSON.parse(await diskFile('.md-pdf.json'));
     assert.equal(metadata.documents['example.md'].template, 'ocean');
     assert.equal(metadata.documents['example.md'].settings['table-min-rows'], '5');
+    assert.equal(metadata.documents['example.md'].settings['page-numbers'], true);
+    assert.equal(
+        metadata.documents['example.md'].settings['page-number-format'],
+        'Page {page} of {pages}',
+    );
     await page.reload();
     await folderSaved();
     assert.equal(await page.locator('#markdown').inputValue(), '# Saved on disk');
     assert.equal(await page.locator('#css-template').inputValue(), 'ocean');
     assert.equal(await page.locator('#table-min-rows').inputValue(), '5');
+    assert.equal(await page.locator('#page-numbers').isChecked(), true);
+    assert.equal(await page.locator('#page-number-format').inputValue(), 'Page {page} of {pages}');
     await page.locator('#mode-markdown').click();
     await page.locator('#library-toggle').click();
     await page.locator('[data-library-action="new-folder"]').click();

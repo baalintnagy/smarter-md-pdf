@@ -442,6 +442,8 @@ try {
         );
     }
     // Print the same iframe DOM in an isolated browser tab for an actual PDF smoke test.
+    await page.locator('#page-numbers').check();
+    await page.locator('#page-number-format').fill('Page {page} of {pages}');
     await source(
         '# Print test\n\n' +
             Array.from(
@@ -451,8 +453,35 @@ try {
     );
     const frame = page.frames().find((item) => item !== page.mainFrame());
     const expectedPages = await preview.locator('.sheet').count();
+    const expectedFooters = Array.from(
+        { length: expectedPages },
+        (_, index) => `Page ${index + 1} of ${expectedPages}`,
+    );
+    assert.deepEqual(
+        await preview.locator('.sheet > .page-number').allTextContents(),
+        expectedFooters,
+        'Live preview includes a numbered footer inside every page',
+    );
     const printPage = await browser.newPage();
     await printPage.setContent(await frame.content());
+    await printPage.emulateMedia({ media: 'print' });
+    assert.deepEqual(
+        await printPage.locator('.sheet > .page-number:visible').allTextContents(),
+        expectedFooters,
+        'Printed pages include the same numbered footers as the preview',
+    );
+    assert.equal(await printPage.locator('.page-caption:visible').count(), 0);
+    assert.ok(
+        await printPage.locator('.sheet').evaluateAll((sheets) =>
+            sheets.every((sheet) => {
+                const bounds = sheet.getBoundingClientRect();
+                const footer = sheet.querySelector('.page-number').getBoundingClientRect();
+                const content = sheet.querySelector('.document').getBoundingClientRect();
+                return footer.top >= content.bottom && footer.bottom < bounds.bottom;
+            }),
+        ),
+        'Printed footers sit below document content and inside each paper sheet',
+    );
     await printPage.pdf({
         path: 'test-results/print.pdf',
         preferCSSPageSize: true,
