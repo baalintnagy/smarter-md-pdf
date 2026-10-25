@@ -4,6 +4,7 @@ const template = (id, name, font, ink, heading, accent, tint, border) => ({
     css: `/* ${name} — customize any document rule below. */
 .document {
   font-family: ${font};
+  text-align: justify;
   --doc-ink: ${ink};
   --doc-heading: ${heading};
   --doc-accent: ${accent};
@@ -11,10 +12,8 @@ const template = (id, name, font, ink, heading, accent, tint, border) => ({
   --doc-border: ${border};
 }
 
-.document p,
-.document ul > li,
-.document ol > li {
-  text-align: justify;
+.document table {
+  text-align: left;
 }
 
 /* Manual break: <div class="page-break"></div> */`,
