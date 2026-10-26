@@ -243,6 +243,18 @@ try {
     await folderSaved();
     assert.equal(await page.locator('.library-root .wb-title').textContent(), 'test-documents');
     assert.equal(await page.locator('.library-root').getAttribute('aria-label'), 'test-documents');
+    await page.getByRole('row', { name: 'test-documents', exact: true }).click();
+    await page.locator('[data-library-action="rename"]').click();
+    assert.equal(await page.locator('#library-name').inputValue(), 'test-documents');
+    await page.locator('#library-name').fill('Writing library');
+    await page.locator('#library-submit').click();
+    await folderSaved();
+    assert.equal(await page.locator('.library-root .wb-title').textContent(), 'Writing library');
+    assert.equal(JSON.parse(await diskFile('.md-pdf.json')).rootName, 'Writing library');
+    assert.equal(
+        await page.locator('#storage-location').textContent(),
+        'Storage: local folder “test-documents”',
+    );
     assert.equal(await page.locator('#markdown').inputValue(), '# Changed externally');
     await page.evaluate(() => {
         window.testDirectoryPicker = window.showDirectoryPicker;
@@ -258,9 +270,11 @@ try {
     });
     await page.locator('#browser-library').click();
     await saved('Saved on this device');
+    assert.equal(await page.locator('.library-root .wb-title').textContent(), 'Root');
     assert.equal(await page.locator('#markdown').inputValue(), '# Browser original');
     await page.locator('#open-directory').click();
     await folderSaved();
+    assert.equal(await page.locator('.library-root .wb-title').textContent(), 'Writing library');
     assert.equal(await page.locator('#markdown').inputValue(), '# Changed externally');
     await page.locator('#browser-library').click();
     await saved('Saved on this device');

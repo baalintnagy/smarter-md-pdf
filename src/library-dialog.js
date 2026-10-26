@@ -1,6 +1,9 @@
 const $ = (id) => document.getElementById(id);
 
 function describeAction(action, node, model, localFolder) {
+    if (action === 'rename-root') {
+        return 'Choose a display name for this library. The local folder name stays the same.';
+    }
     if (action === 'delete') {
         let contents = '';
         if (node.kind === 'folder') {
@@ -21,27 +24,32 @@ function describeAction(action, node, model, localFolder) {
 }
 
 /** Present library actions without owning document mutations or storage. */
-export function showLibraryDialog(action, node, model, localFolder) {
+export function showLibraryDialog(action, node, model, localFolder, rootName = 'Root') {
     const names = {
         'new-document': 'New document',
         'new-folder': 'New folder',
         rename: 'Rename',
+        'rename-root': 'Rename library',
         move: 'Move',
         delete: 'Delete',
     };
     $('library-dialog-title').textContent = names[action];
     $('library-dialog-description').textContent = describeAction(action, node, model, localFolder);
-    const naming = ['new-document', 'new-folder', 'rename'].includes(action);
+    const naming = ['new-document', 'new-folder', 'rename', 'rename-root'].includes(action);
     $('library-name-label').hidden = !naming;
     $('library-name').required = naming;
     $('library-name').value =
-        action === 'rename' ? node.name : action === 'new-folder' ? 'New folder' : 'Untitled.md';
+        action === 'rename' || action === 'rename-root'
+            ? node.name
+            : action === 'new-folder'
+              ? 'New folder'
+              : 'Untitled.md';
     $('library-destination-label').hidden = action !== 'move';
     $('library-destination').replaceChildren();
     if (action === 'move') {
         const blocked = model.descendants(node.id);
         for (const folder of [
-            { id: '', name: 'Root' },
+            { id: '', name: rootName },
             ...model.nodes.filter((item) => item.kind === 'folder' && !blocked.has(item.id)),
         ]) {
             const option = document.createElement('option');

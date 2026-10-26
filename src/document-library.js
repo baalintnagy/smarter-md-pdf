@@ -482,13 +482,12 @@ export class DocumentLibrary {
                 },
             });
         }
-        const rootName =
-            this.storage instanceof DirectoryStorage ? this.storage.handle.name : 'Root';
-        this.tree.present(this.model, this.selectedId, this.rootExpanded, rootName);
+        this.tree.present(this.model, this.selectedId, this.rootExpanded, this.rootName());
         $('export-markdown').disabled = this.model.get(this.selectedId)?.kind !== 'document';
         for (const button of document.querySelectorAll('[data-library-action]')) {
             if (!button.dataset.libraryAction.startsWith('new-')) {
-                button.disabled = !this.model.get(this.selectedId);
+                button.disabled =
+                    !this.model.get(this.selectedId) && button.dataset.libraryAction !== 'rename';
             }
         }
         this.onTreeChange?.(this.model);
@@ -588,12 +587,21 @@ export class DocumentLibrary {
         $('export-markdown').addEventListener('click', () => this.export());
     }
 
+    rootName() {
+        return (
+            this.model.rootName ||
+            (this.storage instanceof DirectoryStorage ? this.storage.handle.name : 'Root')
+        );
+    }
     request(action) {
         if (!this.ready) {
             return;
         }
         this.captureCurrent();
         const node = this.model.get(this.selectedId);
+        if (action === 'rename' && this.selectedId === null) {
+            action = 'rename-root';
+        }
         this.action = action;
         if (action === 'duplicate') {
             const copy = this.model.duplicate(node.id);
@@ -606,7 +614,13 @@ export class DocumentLibrary {
             }
             return;
         }
-        showLibraryDialog(action, node, this.model, this.storage instanceof DirectoryStorage);
+        showLibraryDialog(
+            action,
+            node || { name: this.rootName() },
+            this.model,
+            this.storage instanceof DirectoryStorage,
+            this.rootName(),
+        );
     }
 
     submit() {
@@ -627,6 +641,9 @@ export class DocumentLibrary {
                 } finally {
                     this.opening = false;
                 }
+            }
+            if (action === 'rename-root') {
+                this.model.renameRoot(name);
             }
             if (action === 'move') {
                 this.model.move(this.selectedId, $('library-destination').value || null);

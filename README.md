@@ -46,6 +46,8 @@ provide the secure context this API requires.
 
 The folder's `.md`, `.markdown`, and `.txt` files appear in the library, with real
 subfolders. New document names without one of these extensions receive `.md` on disk.
+Select the library root and choose **Rename** to customize its display name without
+renaming the folder on disk. The display name is saved as `rootName` in `.md-pdf.json`.
 Styles, paper settings, the active document, and expanded folders are saved in
 `.md-pdf.json`; keep this companion file when moving the workspace. Raster images
 are read from disk, and newly imported images are saved alongside the active document.

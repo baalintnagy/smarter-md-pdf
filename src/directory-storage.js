@@ -121,6 +121,9 @@ export class DirectoryStorage {
             }
         }
         const model = new WorkspaceModel();
+        if (metadata.rootName != null) {
+            model.renameRoot(metadata.rootName);
+        }
         const ids = new Map();
         const assets = [];
         for (const [path, entry] of [...entries].sort(
@@ -268,6 +271,7 @@ export class DirectoryStorage {
             JSON.stringify(
                 {
                     version: 1,
+                    rootName: snapshot.rootName,
                     documents,
                     activePath: paths.get(snapshot.activeId),
                     expanded: snapshot.expanded.map((id) => paths.get(id)).filter(Boolean),

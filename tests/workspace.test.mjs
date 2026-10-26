@@ -25,6 +25,17 @@ test('nested trees support rename, move, and deep duplication without sharing co
     assert.deepEqual(new WorkspaceModel(model.snapshot()).snapshot(), model.snapshot());
 });
 
+test('root display names round-trip and reject empty or invalid names', () => {
+    const model = new WorkspaceModel();
+    assert.equal(model.rootName, null);
+    model.renameRoot('  My library  ');
+    assert.equal(new WorkspaceModel(model.snapshot()).rootName, 'My library');
+    for (const name of ['', ' ', 'a/b', 'a\\b', 'a'.repeat(161)]) {
+        assert.throws(() => model.renameRoot(name));
+    }
+    assert.equal(model.rootName, 'My library');
+});
+
 test('folder deletion removes descendants and chooses a remaining document', () => {
     const model = new WorkspaceModel();
     const folder = model.create('folder', 'Delete me');

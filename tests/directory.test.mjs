@@ -108,6 +108,33 @@ test('folder storage round-trips Markdown, styles, settings, nested folders and 
     assert.equal(await loaded.assets[0].blob.text(), 'image bytes');
 });
 
+test('root display names persist in metadata without changing disk paths', async () => {
+    const root = new DirectoryHandle();
+    const storage = new DirectoryStorage(root);
+    const original = await storage.load();
+    assert.equal(original.snapshot.rootName, null);
+    const { model } = documentModel();
+    const paths = directoryPaths(model.snapshot());
+    model.renameRoot('My writing');
+    assert.deepEqual(directoryPaths(model.snapshot()), paths);
+    await storage.save(model.snapshot(), 0, new Map());
+    const metadata = JSON.parse(
+        await (await root.getFileHandle('.md-pdf.json')).getFile().then((file) => file.text()),
+    );
+    assert.equal(metadata.rootName, 'My writing');
+    const loaded = await new DirectoryStorage(root).load();
+    assert.equal(loaded.snapshot.rootName, 'My writing');
+    assert.equal(root.name, 'Documents');
+    assert.equal(
+        await (
+            await (await root.getDirectoryHandle('Notes')).getFileHandle('Plan.md')
+        )
+            .getFile()
+            .then((file) => file.text()),
+        '# Plan',
+    );
+});
+
 test('external edits, additions, deletions and stale tabs block disk writes', async () => {
     for (const change of ['edit', 'add', 'delete', 'metadata', 'image']) {
         const root = new DirectoryHandle();

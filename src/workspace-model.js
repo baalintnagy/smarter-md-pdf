@@ -12,6 +12,7 @@ export class WorkspaceModel {
         this.nodes = structuredClone(snapshot.nodes);
         this.activeId = snapshot.activeId;
         this.expanded = new Set(snapshot.expanded || []);
+        this.rootName = snapshot.rootName == null ? null : nameOf(snapshot.rootName);
         this.validate();
     }
     get(id) {
@@ -83,6 +84,9 @@ export class WorkspaceModel {
         node.name = name;
         return node;
     }
+    renameRoot(name) {
+        this.rootName = nameOf(name);
+    }
     descendants(id) {
         const ids = new Set([id]);
         let changed = true;
@@ -150,6 +154,7 @@ export class WorkspaceModel {
             nodes: this.nodes,
             activeId: this.activeId,
             expanded: [...this.expanded],
+            rootName: this.rootName,
         });
     }
     validate() {
