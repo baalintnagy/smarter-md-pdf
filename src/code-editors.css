@@ -17,7 +17,7 @@
     position: relative;
     min-width: 0;
     border-radius: 7px;
-    background: var(--input);
+    background: var(--editor-bg);
 }
 .code-editor textarea,
 .source-highlight {

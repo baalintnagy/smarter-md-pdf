@@ -44,10 +44,10 @@
     min-height: 560px;
     max-height: max(760px, 75vh);
     overflow: auto;
-    background: var(--surface);
+    background: var(--visual-editor-bg);
 }
 #visual-editor .milkdown {
-    --crepe-color-background: var(--surface);
+    --crepe-color-background: var(--visual-editor-bg);
     --crepe-color-on-background: var(--text);
     --crepe-color-surface: var(--input);
     --crepe-color-surface-low: var(--soft);
@@ -109,7 +109,7 @@
 }
 #visual-editor .milkdown .cm-editor {
     font-family: var(--editor-font);
-    background: var(--input);
+    background: var(--editor-bg);
     color: var(--text);
 }
 #visual-editor .milkdown .cm-gutters {

@@ -15,6 +15,8 @@
     --soft: #edf3fc;
     --canvas: #e4ebf5;
     --input: #f9fbff;
+    --editor-bg: var(--input);
+    --visual-editor-bg: var(--surface);
 }
 :root[data-theme='dark'] {
     color-scheme: dark;
@@ -26,8 +28,10 @@
     --border: #334157;
     --accent: #9ab7e5;
     --soft: #2b394f;
-    --canvas: #141c28;
+    --canvas: var(--editor-bg);
     --input: #1b2535;
+    --editor-bg: #131b28;
+    --visual-editor-bg: var(--editor-bg);
 }
 * {
     box-sizing: border-box;
