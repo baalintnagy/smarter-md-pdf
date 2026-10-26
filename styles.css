@@ -177,7 +177,7 @@ button:disabled {
 main {
     width: 85%;
     margin: auto;
-    padding: 0 clamp(12px, 1.5vw, 28px);
+    padding: 24px clamp(12px, 1.5vw, 28px) 0;
 }
 .intro {
     display: flex;
