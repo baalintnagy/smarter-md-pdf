@@ -37,5 +37,5 @@ export const server = createServer(async (request, response) => {
         response.writeHead(404).end('Not found');
     }
 }).listen(Number(process.env.PORT || 4173), '127.0.0.1', () =>
-    console.log(`Markdown studio: http://127.0.0.1:${server.address().port}`),
+    console.log(`MD-PDF: http://127.0.0.1:${server.address().port}`),
 );

@@ -357,7 +357,7 @@ try {
     await page.screenshot({ path: 'test-results/visual-editor.png', fullPage: true });
     await page.locator('#theme').click();
     await page.waitForFunction(
-        () => getComputedStyle(document.body).backgroundColor === 'rgb(22, 29, 41)',
+        () => getComputedStyle(document.body).backgroundColor === 'rgb(25, 32, 44)',
     );
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(
