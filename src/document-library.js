@@ -482,7 +482,9 @@ export class DocumentLibrary {
                 },
             });
         }
-        this.tree.present(this.model, this.selectedId, this.rootExpanded);
+        const rootName =
+            this.storage instanceof DirectoryStorage ? this.storage.handle.name : 'Root';
+        this.tree.present(this.model, this.selectedId, this.rootExpanded, rootName);
         $('export-markdown').disabled = this.model.get(this.selectedId)?.kind !== 'document';
         for (const button of document.querySelectorAll('[data-library-action]')) {
             if (!button.dataset.libraryAction.startsWith('new-')) {

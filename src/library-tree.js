@@ -46,7 +46,7 @@ export class LibraryTree {
                 row.setAttribute(
                     'aria-label',
                     root
-                        ? 'Root'
+                        ? node.title
                         : `${node.data.kind === 'folder' ? 'Select folder' : 'Open'} ${node.title}`,
                 );
                 row.classList.toggle('open-document', node.key === this.activeId);
@@ -101,7 +101,7 @@ export class LibraryTree {
         });
     }
 
-    present(model, selectedId, expanded) {
+    present(model, selectedId, expanded, rootName = 'Root') {
         const branch = (parentId) =>
             model.children(parentId).map((node) => ({
                 key: node.id,
@@ -114,7 +114,7 @@ export class LibraryTree {
         const source = [
             {
                 key: ROOT,
-                title: 'Root',
+                title: rootName,
                 kind: 'folder',
                 classes: 'library-root',
                 expanded,

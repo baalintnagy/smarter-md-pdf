@@ -241,6 +241,8 @@ try {
     assert.equal(await page.locator('#reconnect-directory').isVisible(), true);
     await page.locator('#reconnect-directory').click();
     await folderSaved();
+    assert.equal(await page.locator('.library-root .wb-title').textContent(), 'test-documents');
+    assert.equal(await page.locator('.library-root').getAttribute('aria-label'), 'test-documents');
     assert.equal(await page.locator('#markdown').inputValue(), '# Changed externally');
     await page.evaluate(() => {
         window.testDirectoryPicker = window.showDirectoryPicker;
