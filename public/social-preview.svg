@@ -11,7 +11,7 @@
         <rect x="64" y="58" width="52" height="52" rx="13" fill="#3266a8" />
         <text x="72" y="94" fill="#fff" font-size="29" font-weight="700">m↓</text>
         <text x="132" y="95" fill="#fff" font-size="34" font-weight="650">MD-PDF</text>
-        <text x="64" y="195" fill="#fff" font-size="59" font-weight="700">Markdown to polished PDF.</text>
+        <text x="64" y="195" fill="#fff" font-size="59" font-weight="700">Markdown to PDF</text>
         <text x="66" y="244" fill="#c1d6ef" font-size="25">Visual editing. Custom CSS. Smart pagination.</text>
         <rect x="64" y="292" width="1072" height="245" rx="14" fill="#0b1a2d" stroke="#50749b" />
         <path d="M80 292H1120Q1136 292 1136 308V330H64V308Q64 292 80 292" fill="#233e60" />
