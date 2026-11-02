@@ -4,8 +4,13 @@ import { DEFAULT_PAGE_NUMBER_FORMAT, formatPageNumber } from './page-numbers.js'
 const MM = 96 / 25.4;
 const heading = (node) => /^H[1-6]$/.test(node?.tagName);
 const manualBreak = (node) => node?.classList?.contains('page-break');
+const empty = (node) =>
+    !node.textContent.trim() &&
+    !(node.nodeType === 1 && node.matches('img,table,input,hr,.diagram,.math-display')) &&
+    !node.querySelector?.('img,table,input,hr,.diagram,.math-display');
 const scalable = (node) =>
-    /^(P|TABLE|PRE|UL|OL|BLOCKQUOTE|FIGURE|IMG|DIV|SECTION)$/.test(node?.tagName);
+    /^(P|TABLE|PRE|UL|OL|BLOCKQUOTE|FIGURE|IMG|DIV|SECTION)$/.test(node?.tagName) &&
+    !node.querySelector('h1,h2,h3,h4,h5,h6');
 
 /** Measure candidate block adjustments without changing surrounding typography. */
 export class Paginator {
@@ -198,7 +203,11 @@ export class Paginator {
             }
             const group = [node];
             if (settings.smart) {
-                while (heading(group.at(-1)) && queue.length && !manualBreak(queue[0])) {
+                while (
+                    (heading(group.at(-1)) || empty(group.at(-1))) &&
+                    queue.length &&
+                    !manualBreak(queue[0])
+                ) {
                     group.push(queue.shift());
                 }
             }
@@ -263,7 +272,7 @@ export class Paginator {
                     continue;
                 }
             }
-            const pieces = this.splitContainer(tail);
+            const pieces = this.splitContainer(tail, settings.smart);
             if (pieces) {
                 group.forEach((item) => item.remove());
                 queue.unshift(...group.slice(0, -1), ...pieces);
@@ -278,7 +287,7 @@ export class Paginator {
             }
             // On an empty page, split oversized text beneath its heading rather than stranding the heading.
             reset(tail);
-            const remainder = this.splitText(tail, fits);
+            const remainder = this.splitText(tail, fits, settings.smart);
             if (remainder) {
                 queue.unshift(remainder);
                 createPage();
@@ -367,7 +376,7 @@ export class Paginator {
         return [first, rest];
     }
 
-    splitContainer(node) {
+    splitContainer(node, smart = true) {
         if (
             node.nodeType !== 1 ||
             !['UL', 'OL', 'BLOCKQUOTE', 'DIV', 'SECTION'].includes(node.tagName) ||
@@ -376,24 +385,37 @@ export class Paginator {
             return null;
         }
         let itemIndex = 0;
-        return [...node.childNodes]
-            .filter((child) => child.nodeType !== 3 || child.textContent.trim())
-            .map((child) => {
-                const wrapper = node.cloneNode(false);
-                wrapper.style.removeProperty('zoom');
-                delete wrapper.dataset.layoutScale;
-                if (node.tagName === 'OL') {
-                    wrapper.start = (node.start || 1) + itemIndex;
-                }
-                if (child.nodeName === 'LI') {
-                    itemIndex++;
-                }
-                wrapper.append(child.cloneNode(true));
-                return wrapper;
-            });
+        const groups = [];
+        for (const child of node.childNodes) {
+            if (child.nodeType === 3 && !child.textContent.trim()) {
+                continue;
+            }
+            const previous = groups.at(-1);
+            if (smart && previous && (heading(previous.at(-1)) || empty(previous.at(-1)))) {
+                previous.push(child);
+            } else {
+                groups.push([child]);
+            }
+        }
+        // A heading chain and its first content block are indivisible at this level.
+        // Text splitting below can still divide an oversized paragraph inside that wrapper.
+        if (groups.length <= 1) {
+            return null;
+        }
+        return groups.map((children) => {
+            const wrapper = node.cloneNode(false);
+            wrapper.style.removeProperty('zoom');
+            delete wrapper.dataset.layoutScale;
+            if (node.tagName === 'OL') {
+                wrapper.start = (node.start || 1) + itemIndex;
+            }
+            itemIndex += children.filter((child) => child.nodeName === 'LI').length;
+            wrapper.append(...children.map((child) => child.cloneNode(true)));
+            return wrapper;
+        });
     }
 
-    splitText(node, fits) {
+    splitText(node, fits, smart = true) {
         if (
             node.nodeType === 1 &&
             (node.matches('.math-source,.diagram') || node.querySelector('.katex'))
@@ -411,10 +433,27 @@ export class Paginator {
         }
         const original = node.cloneNode(true);
         const text = original.textContent;
-        const boundaries = [...text.matchAll(/\s+/g)].map((match) => match.index + match[0].length);
+        // Never cut inside a nested heading or leave it without following text.
+        let protectedEnd = 0;
+        if (smart) {
+            const walker = this.document.createTreeWalker(original, 4);
+            let current;
+            let offset = 0;
+            while ((current = walker.nextNode())) {
+                offset += current.length;
+                if (current.parentElement.closest('h1,h2,h3,h4,h5,h6')) {
+                    protectedEnd = offset;
+                }
+            }
+        }
+        const boundaries = [...text.matchAll(/\s+/g)]
+            .map((match) => match.index + match[0].length)
+            .filter((position) => !protectedEnd || text.slice(protectedEnd, position).trim());
         if (!boundaries.length) {
             for (let i = 1; i < text.length; i++) {
-                boundaries.push(i);
+                if (i > protectedEnd) {
+                    boundaries.push(i);
+                }
             }
         }
         const rangePart = (start, end) => {

@@ -8,7 +8,7 @@ body { background:transparent; }
 .page-body { position:absolute; overflow:visible; }
 .document { display:flow-root; font:11pt/1.65 Arial, Helvetica, sans-serif; overflow-wrap:anywhere; color:var(--doc-ink, #333333); }
 .document > :first-child { margin-top:0; }.document > :last-child { margin-bottom:0; }
-.document h1,.document h2,.document h3,.document h4 { line-height:1.25; color:var(--doc-heading, #181818); break-after:avoid; }
+.document h1,.document h2,.document h3,.document h4,.document h5,.document h6 { line-height:1.25; color:var(--doc-heading, #181818); break-after:avoid; }
 .document h1 { font-size:29pt; letter-spacing:-1.2px; margin:0 0 18pt; font-weight:650; }
 .document h2 { font-size:17pt; margin:22pt 0 10pt; letter-spacing:-.4px; }
 .document h3 { font-size:13pt; margin:16pt 0 7pt; }
