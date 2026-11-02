@@ -2,6 +2,7 @@ import { imageAssetKey, findImageAsset } from './image-assets.js';
 import { Marked } from '../vendor/marked.esm.js';
 import { highlightCode } from './code-highlighting.js';
 import { inlineAsciiMath } from './asciimath.js';
+import { mathExtensions } from './math-markdown.js';
 
 // Tokens preserve TeX backslashes before ordinary Markdown escaping takes place.
 const escapeHTML = (value) =>
@@ -9,22 +10,6 @@ const escapeHTML = (value) =>
         /[&<>"']/g,
         (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char],
     );
-const mathToken = (name, level, pattern, start) => ({
-    name,
-    level,
-    start,
-    tokenizer(source) {
-        const match = source.match(pattern);
-        if (match) {
-            return { type: name, raw: match[0], text: match[1] ?? match[2] };
-        }
-    },
-    renderer(token) {
-        const tag = level === 'block' ? 'div' : 'span';
-        const className = level === 'block' ? 'math-source math-display' : 'math-source';
-        return `<${tag} class="${className}">${escapeHTML(token.text)}</${tag}>`;
-    },
-});
 const marked = new Marked({
     extensions: [
         {
@@ -35,18 +20,7 @@ const marked = new Marked({
             renderer: (token) =>
                 `<span class="math-source asciimath-source">${escapeHTML(token.text)}</span>`,
         },
-        mathToken(
-            'displayMath',
-            'block',
-            /^ {0,3}\$\$\s*\n?([\s\S]+?)\n?\$\$(?:\n|$)|^ {0,3}\\\[([\s\S]+?)\\\](?:\n|$)/,
-            (source) => source.search(/\$\$|\\\[/),
-        ),
-        mathToken(
-            'inlineMath',
-            'inline',
-            /^\$(?!\$)([^\s$](?:[^$\n]*?[^\s$])?)\$(?!\d)|^\\\(([\s\S]+?)\\\)/,
-            (source) => source.search(/\$(?!\$)|\\\(/),
-        ),
+        ...mathExtensions,
     ],
 });
 

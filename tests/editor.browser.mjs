@@ -140,6 +140,23 @@ try {
         'New source wins over a stale hidden visual edit.',
         'Hidden visual updates cannot overwrite source-mode edits',
     );
+    const delimiterSource =
+        'Literal `$$x$$` and `$y$`; math $$x^2$$ and $y$. Edit here.\n\n$$z^2$$';
+    await setSource(delimiterSource);
+    assert.equal(await page.locator('#markdown').inputValue(), delimiterSource);
+    assert.deepEqual(await preview.locator('#pages code').allTextContents(), ['$$x$$', '$y$']);
+    await rich.locator('p').first().click();
+    await page.keyboard.press('End');
+    await page.keyboard.type(' changed');
+    await page.waitForFunction(() => document.getElementById('markdown').value.includes('changed'));
+    await ready();
+    assert.deepEqual(await preview.locator('#pages code').allTextContents(), ['$$x$$', '$y$']);
+    assert.deepEqual(await preview.locator('#pages .katex annotation').allTextContents(), [
+        'x^2',
+        'y',
+        'z^2',
+    ]);
+    assert.equal(await preview.locator('#pages .render-error').count(), 0);
     await setSource(original);
     await rich.locator('h1').first().click();
     await page.keyboard.press('End');

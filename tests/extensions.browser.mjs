@@ -98,6 +98,28 @@ try {
     await page
         .locator('#markdown')
         .fill(
+            '`$$x$$` literal, `$y$`, and ``a ` tick $$z$$``.\n\n' +
+                'Before $$x^2$$ and $y$ after.\n\n$$z^2$$\n\n' +
+                '```tex\n$$x$$\n$y$\n```',
+        );
+    await page.waitForFunction(() => !document.getElementById('print').disabled);
+    assert.deepEqual(await preview.locator('#pages code').allTextContents(), [
+        '$$x$$',
+        '$y$',
+        'a ` tick $$z$$',
+        '$$x$$\n$y$\n',
+    ]);
+    assert.deepEqual(await preview.locator('#pages .katex annotation').allTextContents(), [
+        'x^2',
+        'y',
+        'z^2',
+    ]);
+    assert.equal(await preview.locator('#pages .katex-display').count(), 1);
+    assert.equal(await preview.locator('#pages p').count(), 2);
+    assert.equal(await preview.locator('#pages .render-error').count(), 0);
+    await page
+        .locator('#markdown')
+        .fill(
             'Bad $\\notACommand{x}$ math and @{color(#zzzzzz)(x)}\n\n```mermaid\ninvalid diagram input\n```',
         );
     await page.waitForFunction(() => !document.getElementById('print').disabled);
