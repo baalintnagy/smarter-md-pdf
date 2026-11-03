@@ -14,7 +14,8 @@
     padding: 5px 9px;
 }
 .editor-modes [aria-pressed='true'] {
-    background: var(--soft);
+    background: transparent;
+    border-color: var(--accent);
     color: var(--accent);
     border-color: var(--accent);
     font-weight: 650;
@@ -158,6 +159,20 @@
 #visual-editor .milkdown .top-bar-heading-label {
     min-width: 64px;
     font-size: 11px;
+}
+#visual-editor .milkdown button,
+#visual-editor .milkdown :is(.top-bar-item, .toolbar-item, .top-bar-heading-button) {
+    background: transparent;
+}
+#visual-editor .milkdown :is(.top-bar-item, .toolbar-item, .top-bar-heading-button):hover {
+    color: var(--accent);
+    box-shadow:
+        0 0 0 1px var(--accent),
+        0 3px 16px var(--hover-glow);
+}
+#visual-editor .milkdown :is(.top-bar-item, .toolbar-item).active {
+    color: var(--accent);
+    outline: 1px solid var(--accent);
 }
 #visual-editor .preserved-html {
     white-space: pre-wrap;
