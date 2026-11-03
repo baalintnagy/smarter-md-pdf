@@ -313,7 +313,7 @@ try {
     await page.screenshot({ path: 'test-results/blue-studio.png', fullPage: true });
     await page.locator('#theme').click();
     await page.waitForFunction(
-        () => getComputedStyle(document.body).backgroundColor === 'rgb(25, 32, 44)',
+        () => getComputedStyle(document.body).backgroundColor === 'rgb(9, 15, 25)',
     );
     await page.waitForFunction(
         () =>
