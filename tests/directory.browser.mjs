@@ -114,6 +114,13 @@ try {
     assert.equal(await horizontal.getAttribute('aria-pressed'), 'true');
     assert.ok(
         await page.evaluate(() => {
+            const root = document.getElementById('preview').contentDocument.documentElement;
+            return root.scrollWidth <= root.clientWidth;
+        }),
+        'Fit horizontally leaves no horizontal scrollbar inside the preview',
+    );
+    assert.ok(
+        await page.evaluate(() => {
             const frame = document.getElementById('preview');
             return (
                 frame.contentDocument.querySelector('.sheet').getBoundingClientRect().width <=

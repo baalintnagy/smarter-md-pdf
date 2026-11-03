@@ -419,6 +419,22 @@ window.addEventListener('pagehide', () => library.dispose());
 
 syncPreviewZoom = initializePanelZoom(updateZoom);
 
+// Anchor the desktop preview to its grid column independently of page scrolling.
+const previewColumn = $('preview-column');
+function positionPreview() {
+    const bounds = previewColumn.getBoundingClientRect();
+    const root = document.documentElement.style;
+    root.setProperty('--preview-top', `${bounds.top + window.scrollY}px`);
+    root.setProperty('--preview-left', `${bounds.left}px`);
+    root.setProperty('--preview-width', `${bounds.width}px`);
+}
+const previewLayout = new ResizeObserver(positionPreview);
+previewLayout.observe(previewColumn);
+previewLayout.observe(document.querySelector('.workspace'));
+previewLayout.observe(document.querySelector('.app-header'));
+window.addEventListener('resize', positionPreview);
+positionPreview();
+
 // Keep sticky content below the header as its height changes on smaller screens.
 new ResizeObserver(([entry]) => {
     document.documentElement.style.setProperty(

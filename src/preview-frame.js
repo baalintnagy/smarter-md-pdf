@@ -7,7 +7,7 @@ export function initializePreviewFrame(frame) {
     const canvas = getComputedStyle(frame.ownerDocument.documentElement).getPropertyValue(
         '--canvas',
     );
-    document.documentElement.style.cssText = `background-color:${canvas};transition:background-color 800ms ease;`;
+    document.documentElement.style.cssText = `background-color:${canvas};transition:background-color 800ms ease;scrollbar-gutter:stable;`;
     const base = document.createElement('style');
     base.textContent = DOCUMENT_CSS;
     document.head.append(base);
@@ -32,7 +32,8 @@ export function updatePreviewZoom(frame, pages, mode, syncPreviewZoom) {
     if (!pages.length) {
         return;
     }
-    const available = Math.max(100, frame.clientWidth - 48);
+    // The inner viewport excludes the reserved vertical scrollbar gutter.
+    const available = Math.max(1, frame.contentDocument.documentElement.clientWidth - 48);
     const pageWidth = pages[0].sheet.offsetWidth;
     const requestedScale =
         mode === 'fit-height'

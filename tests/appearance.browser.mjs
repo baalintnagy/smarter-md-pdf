@@ -79,6 +79,18 @@ try {
     await page.locator('#visual-editor[data-state=ready]').waitFor();
     await ready();
     await checkPageNumbers();
+    const anchoredPreview = await page.locator('.preview-panel').boundingBox();
+    for (const offset of [500, null]) {
+        await page.evaluate((target) => {
+            window.scrollTo(0, typeof target === 'number' ? target : document.body.scrollHeight);
+        }, offset);
+        assert.equal(
+            (await page.locator('.preview-panel').boundingBox()).y,
+            anchoredPreview.y,
+            'Outside scrolling leaves the desktop preview anchored, including at the page bottom',
+        );
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
     assert.equal(
         await page
             .locator('.app-header')

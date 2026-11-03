@@ -652,25 +652,25 @@
                 >
                     <span aria-hidden="true"></span>
                 </div>
-                <section
-                    id="preview-column"
-                    class="preview-panel"
-                    aria-label="Paginated document preview"
-                >
-                    <div class="preview-toolbar">
-                        <div>
-                            <span class="preview-dot"></span><strong>Print preview</strong
-                            ><span id="page-count" class="small-tag">Preparing…</span>
+                <div id="preview-column" class="preview-column">
+                    <section class="preview-panel" aria-label="Paginated document preview">
+                        <div class="preview-toolbar">
+                            <div>
+                                <span class="preview-dot"></span><strong>Print preview</strong
+                                ><span id="page-count" class="small-tag">Preparing…</span>
+                            </div>
+                            <input id="zoom" type="hidden" value="fit-height" />
                         </div>
-                        <input id="zoom" type="hidden" value="fit-height" />
-                    </div>
-                    <div id="status" role="status" aria-live="polite">Preparing your pages…</div>
-                    <iframe
-                        id="preview"
-                        title="Document pages"
-                        sandbox="allow-same-origin allow-modals"
-                    ></iframe>
-                </section>
+                        <div id="status" role="status" aria-live="polite">
+                            Preparing your pages…
+                        </div>
+                        <iframe
+                            id="preview"
+                            title="Document pages"
+                            sandbox="allow-same-origin allow-modals"
+                        ></iframe>
+                    </section>
+                </div>
             </div>
         </main>
         <footer class="app-footer"><span>© 2026 MD-PDF</span></footer>
