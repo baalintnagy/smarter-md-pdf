@@ -30,10 +30,11 @@ export const rawHTMLNode = $node('raw_html_block', () => ({
             class: `preserved-html${isPageBreak(node.attrs.value) ? ' manual-page-break' : ''}`,
             'data-raw-html': node.attrs.value,
             contenteditable: 'false',
+            ...(isPageBreak(node.attrs.value)
+                ? { role: 'img', 'aria-label': 'Page break', title: 'Page break' }
+                : {}),
         },
-        isPageBreak(node.attrs.value)
-            ? 'PAGE BREAK'
-            : `HTML · edit in Markdown\n${node.attrs.value}`,
+        isPageBreak(node.attrs.value) ? '↧' : `HTML · edit in Markdown\n${node.attrs.value}`,
     ],
     parseDOM: [
         { tag: 'div[data-raw-html]', getAttrs: (element) => ({ value: element.dataset.rawHtml }) },

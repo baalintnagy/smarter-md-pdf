@@ -172,12 +172,24 @@
     color: var(--muted);
 }
 #visual-editor .manual-page-break {
-    text-align: center;
-    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+    margin: 8px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
     font:
-        10px/1.8 Inter,
+        12px/16px Inter,
         'Segoe UI',
         sans-serif;
+}
+#visual-editor .manual-page-break::before,
+#visual-editor .manual-page-break::after {
+    content: '';
+    flex: 1;
+    border-top: 1px dashed var(--border);
 }
 @media (max-width: 740px) {
     #visual-editor .milkdown .ProseMirror {
