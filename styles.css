@@ -19,6 +19,8 @@
     --surface-light: rgb(111 155 210 / 8%);
     --editor-bg: var(--input);
     --visual-editor-bg: var(--surface);
+    --hover-bg: #dce9fa;
+    --hover-glow: rgb(50 102 168 / 25%);
 }
 :root[data-theme='dark'] {
     color-scheme: dark;
@@ -36,6 +38,8 @@
     --spotlight: rgb(111 155 210 / 14%);
     --surface-light: rgb(111 155 210 / 7%);
     --visual-editor-bg: var(--editor-bg);
+    --hover-bg: #263e5e;
+    --hover-glow: rgb(154 183 229 / 35%);
 }
 * {
     box-sizing: border-box;
@@ -101,10 +105,6 @@ button {
     border-radius: 7px;
     background: var(--surface);
     padding: 9px 13px;
-}
-button:hover,
-.file-button:hover {
-    filter: brightness(0.94);
 }
 button:disabled {
     opacity: 0.5;
@@ -712,4 +712,46 @@ iframe {
 }
 .controls > .panel {
     overflow: auto;
+}
+
+/* Respond quickly and visibly to pointer hover in either theme. */
+button,
+.file-button,
+select,
+input:not([type='hidden']):not([type='range']),
+textarea {
+    transition:
+        background-color 150ms ease,
+        color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+}
+button:not(:disabled):hover,
+.file-button:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 25%),
+        0 0 0 1px var(--accent),
+        0 3px 16px var(--hover-glow);
+}
+button.primary:not(:disabled):hover {
+    background: linear-gradient(180deg, #4c8bd1, #3266a8);
+    color: white;
+}
+select:not(:disabled):hover,
+input:not(:disabled):not([type='hidden']):not([type='range']):hover,
+textarea:not(:disabled):hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--hover-glow);
+}
+@media (prefers-reduced-motion: reduce) {
+    button,
+    .file-button,
+    select,
+    input,
+    textarea {
+        transition: none;
+    }
 }

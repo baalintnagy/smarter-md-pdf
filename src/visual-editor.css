@@ -57,7 +57,7 @@
     --crepe-color-primary: var(--accent);
     --crepe-color-secondary: var(--soft);
     --crepe-color-on-secondary: var(--text);
-    --crepe-color-hover: var(--soft);
+    --crepe-color-hover: var(--hover-bg);
     --crepe-color-selected: var(--border);
     --crepe-color-inline-area: var(--soft);
     --crepe-color-inline-code: var(--accent);

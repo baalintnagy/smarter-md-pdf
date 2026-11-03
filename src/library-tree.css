@@ -8,9 +8,9 @@
     --wb-active-border-color: var(--border);
     --wb-active-color-grayscale: var(--soft);
     --wb-active-border-color-grayscale: var(--border);
-    --wb-hover-color: var(--soft);
-    --wb-active-hover-color: var(--soft);
-    --wb-active-hover-border-color: var(--border);
+    --wb-hover-color: var(--hover-bg);
+    --wb-active-hover-color: var(--hover-bg);
+    --wb-active-hover-border-color: var(--accent);
     --wb-drop-target-color: var(--soft);
     border: 0;
     border-radius: 0;
