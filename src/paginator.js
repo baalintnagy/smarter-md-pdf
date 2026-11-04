@@ -278,6 +278,21 @@ export class Paginator {
                 queue.unshift(...group.slice(0, -1), ...pieces);
                 continue;
             }
+            if (tail.tagName === 'P') {
+                reset(tail);
+                const remainder = this.splitText(
+                    tail,
+                    fits,
+                    settings.smart,
+                    settings.minTableRows ?? 3,
+                    !previousCount,
+                );
+                if (remainder) {
+                    queue.unshift(remainder);
+                    createPage();
+                    continue;
+                }
+            }
             if (previousCount) {
                 group.forEach((item) => item.remove());
                 group.forEach(reset);
@@ -287,7 +302,12 @@ export class Paginator {
             }
             // On an empty page, split oversized text beneath its heading rather than stranding the heading.
             reset(tail);
-            const remainder = this.splitText(tail, fits, settings.smart);
+            const remainder = this.splitText(
+                tail,
+                fits,
+                settings.smart,
+                settings.minTableRows ?? 3,
+            );
             if (remainder) {
                 queue.unshift(remainder);
                 createPage();
@@ -415,7 +435,7 @@ export class Paginator {
         });
     }
 
-    splitText(node, fits, smart = true) {
+    splitText(node, fits, smart = true, minimumLines = 3, fresh = true) {
         if (
             node.nodeType === 1 &&
             (node.matches('.math-source,.diagram') || node.querySelector('.katex'))
@@ -499,6 +519,49 @@ export class Paginator {
         if (!best || best >= text.length) {
             node.replaceChildren(...original.childNodes);
             return null;
+        }
+        if (smart) {
+            // Measure wrapped text lines at the fragment's actual width, preserving inline markup.
+            const lineCount = (start, end) => {
+                node.replaceChildren(rangePart(start, end));
+                const range = this.document.createRange();
+                const walker = this.document.createTreeWalker(node, 4);
+                const rects = [];
+                let current;
+                while ((current = walker.nextNode())) {
+                    range.selectNodeContents(current);
+                    rects.push(...range.getClientRects());
+                }
+                rects.sort((a, b) => a.top - b.top);
+                let lines = 0;
+                let center = -Infinity;
+                for (const rect of rects) {
+                    if (rect.width && rect.height && rect.top > center) {
+                        lines++;
+                        center = rect.top + rect.height / 2;
+                    }
+                }
+                return lines;
+            };
+            const candidates = boundaries.filter((position) => position <= best).reverse();
+            let selected = 0;
+            let bestFloor = 0;
+            for (const position of candidates) {
+                const floor = Math.min(lineCount(0, position), lineCount(position, text.length));
+                if (floor >= minimumLines) {
+                    selected = position;
+                    break;
+                }
+                if (fresh && floor > bestFloor) {
+                    selected = position;
+                    bestFloor = floor;
+                }
+            }
+            if (!selected) {
+                node.replaceChildren(...original.childNodes);
+                return null;
+            }
+            best = selected;
         }
         node.replaceChildren(rangePart(0, best));
         const rest = original.cloneNode(false);

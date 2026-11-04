@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { server } from '../scripts/serve.mjs';
 
@@ -97,6 +98,82 @@ try {
             );
         }
     }
+    assert.equal(await page.getByText('Minimum rows per fragment', { exact: false }).count(), 1);
+    await page.route('**/src/*.js', async (route) => {
+        const filename = new URL(route.request().url()).pathname.split('/').at(-1);
+        await route.fulfill({
+            contentType: 'text/javascript',
+            body: await readFile(new URL('../src/' + filename, import.meta.url), 'utf8'),
+        });
+    });
+    const checkFragments = async (minimum, smart = true, count = 14) =>
+        page.evaluate(
+            async ({ minimum, smart, count }) => {
+                const { Paginator } = await import('/src/paginator.js');
+                const doc = document.createElement('div');
+                doc.innerHTML = '<div id="pages"></div>';
+                document.body.append(doc);
+                const style = document.createElement('style');
+                style.textContent = '#pages .test-prose { font: 20px/20px monospace; margin: 0; }';
+                doc.append(style);
+                // One word per rendered line, with inline markup retained across splits.
+                const fragment = document.createDocumentFragment();
+                const filler = document.createElement('div');
+                filler.style.height = '100px';
+                filler.textContent = 'Earlier text';
+                const paragraph = document.createElement('p');
+                paragraph.className = 'test-prose';
+                paragraph.innerHTML = Array.from(
+                    { length: count },
+                    () => '<strong>abcdefgh</strong> ',
+                ).join('');
+                fragment.append(filler, paragraph);
+                const result = new Paginator(document).paginate(fragment, {
+                    width: 50,
+                    height: 80,
+                    margin: 10,
+                    minScale: 100,
+                    maxScale: 100,
+                    scaleMode: 'manual',
+                    smart,
+                    minTableRows: minimum,
+                });
+                const parts = result.pages.map(({ content }) =>
+                    [...content.querySelectorAll('p')].map((p) => ({
+                        words: p.textContent.trim().split(/\s+/).length,
+                        lines: Math.round(p.getBoundingClientRect().height / 20),
+                        strong: !!p.querySelector('strong'),
+                    })),
+                );
+                doc.remove();
+                return { parts, warnings: result.warnings };
+            },
+            { minimum, smart, count },
+        );
+    const five = await checkFragments(5);
+    assert.equal(five.parts[0][0].lines, 6, 'Paragraph uses remaining page space');
+    assert.ok(five.parts.flat().every((part) => part.lines >= 5 && part.strong));
+    assert.equal(
+        five.parts.flat().reduce((sum, part) => sum + part.words, 0),
+        14,
+    );
+    const seven = await checkFragments(7);
+    assert.equal(seven.parts[0].length, 0, 'Insufficient space moves paragraph to a fresh page');
+    assert.deepEqual(
+        seven.parts
+            .slice(1)
+            .flat()
+            .map((part) => part.lines),
+        [7, 7],
+    );
+    const relaxed = await checkFragments(100, true, 30);
+    assert.deepEqual(relaxed.warnings, [], 'Impossible minimum relaxes on fresh pages');
+    assert.equal(
+        relaxed.parts.flat().reduce((sum, part) => sum + part.words, 0),
+        30,
+    );
+    const plain = await checkFragments(7, false);
+    assert.equal(plain.parts[0][0].lines, 6, 'Smart minimum is disabled with smart breaks');
     assert.deepEqual(errors, []);
     console.log(
         'Pagination checks passed: live scale recalculation, nested type, H1–H6 keep-with-next.',

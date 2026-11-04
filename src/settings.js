@@ -24,9 +24,7 @@ export function validateSettings(settings) {
         throw new Error('Choose a scale range between 50% and 100%, with minimum ≤ maximum.');
     }
     if (!Number.isInteger(minTableRows) || minTableRows < 1 || minTableRows > 100) {
-        throw new Error(
-            'Minimum rows per table fragment must be a whole number between 1 and 100.',
-        );
+        throw new Error('Minimum rows per fragment must be a whole number between 1 and 100.');
     }
     const format = settings.pageNumberFormat ?? DEFAULT_PAGE_NUMBER_FORMAT;
     if (
