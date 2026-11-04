@@ -21,6 +21,12 @@
     --visual-editor-bg: var(--surface);
     --hover-bg: #dce9fa;
     --hover-glow: rgb(50 102 168 / 25%);
+    --hover-text: #234f85;
+    --brand-hover-text: #183e6d;
+    --brand-text-glow: rgb(50 102 168 / 35%);
+    --brand-symbol-glow: rgb(50 102 168 / 55%);
+    --brand-halo: rgb(50 102 168 / 18%);
+    --control-hover-shadow: 0 0 0 1px var(--accent), 0 3px 16px var(--hover-glow);
 }
 :root[data-theme='dark'] {
     color-scheme: dark;
@@ -40,6 +46,11 @@
     --visual-editor-bg: var(--editor-bg);
     --hover-bg: #263e5e;
     --hover-glow: rgb(154 183 229 / 35%);
+    --hover-text: #d5e5ff;
+    --brand-hover-text: #fff;
+    --brand-text-glow: rgb(255 255 255 / 65%);
+    --brand-symbol-glow: rgb(255 255 255 / 80%);
+    --brand-halo: rgb(255 255 255 / 18%);
 }
 * {
     box-sizing: border-box;
@@ -633,14 +644,6 @@ iframe {
     border-radius: 50%;
     color: var(--text);
 }
-.theme-toggle:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-:root[data-theme='dark'] .theme-toggle:hover {
-    color: #fff;
-    border-color: #fff;
-}
 .theme-toggle:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
@@ -706,6 +709,7 @@ iframe {
 
 /* Respond quickly and visibly to pointer hover in either theme. */
 button,
+a,
 .file-button,
 select,
 input:not([type='hidden']):not([type='range']),
@@ -714,22 +718,62 @@ textarea {
         background-color 150ms ease,
         color 150ms ease,
         border-color 150ms ease,
-        box-shadow 150ms ease;
+        box-shadow 150ms ease,
+        text-shadow 150ms ease;
 }
-button:not(:disabled):hover,
-.file-button:hover {
+button:not(:disabled):is(:hover, :focus-visible),
+.file-button:is(:hover, :focus-visible) {
     background: transparent;
     border-color: var(--accent);
-    color: var(--accent);
-    box-shadow:
-        0 0 0 1px var(--accent),
-        0 3px 16px var(--hover-glow);
+    color: var(--hover-text);
+    box-shadow: var(--control-hover-shadow);
 }
 select:not(:disabled):hover,
 input:not(:disabled):not([type='hidden']):not([type='range']):hover,
 textarea:not(:disabled):hover {
     border-color: var(--accent);
     box-shadow: 0 0 0 2px var(--hover-glow);
+}
+/* Text links and the brand illuminate their artwork rather than an enclosing box. */
+a:not(.brand):is(:hover, :focus-visible) {
+    color: var(--hover-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-shadow: 0 0 12px var(--brand-text-glow);
+}
+.brand:is(:hover, :focus-visible) {
+    color: var(--brand-hover-text);
+    text-decoration: none;
+    text-shadow:
+        0 0 12px var(--brand-text-glow),
+        0 0 3px var(--brand-text-glow);
+}
+.brand-mark {
+    transition:
+        box-shadow 150ms ease,
+        text-shadow 150ms ease;
+}
+.brand:is(:hover, :focus-visible) .brand-mark {
+    text-shadow: 0 0 4px var(--brand-symbol-glow);
+    box-shadow:
+        0 0 6px var(--brand-text-glow),
+        0 0 14px var(--brand-halo);
+}
+/* Keep native slider behavior, with a subtle hint of the logo's halo. */
+.zoom-control input[type='range'] {
+    cursor: pointer;
+    transition: filter 150ms ease;
+}
+.zoom-control input[type='range']:not(:disabled):is(:hover, :focus-visible) {
+    filter: drop-shadow(0 0 3px var(--brand-halo));
+}
+.zoom-control:has(input[type='range']:not(:disabled):is(:hover, :focus-visible)) output {
+    color: var(--brand-hover-text);
+}
+.zoom-control output {
+    transition:
+        color 150ms ease,
+        text-shadow 150ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
     button,

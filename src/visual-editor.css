@@ -164,11 +164,14 @@
 #visual-editor .milkdown :is(.top-bar-item, .toolbar-item, .top-bar-heading-button) {
     background: transparent;
 }
-#visual-editor .milkdown :is(.top-bar-item, .toolbar-item, .top-bar-heading-button):hover {
-    color: var(--accent);
-    box-shadow:
-        0 0 0 1px var(--accent),
-        0 3px 16px var(--hover-glow);
+#visual-editor
+    .milkdown
+    :is(.top-bar-item, .toolbar-item, .top-bar-heading-button):not(:disabled):is(
+        :hover,
+        :focus-visible
+    ) {
+    color: var(--hover-text);
+    box-shadow: var(--control-hover-shadow);
 }
 #visual-editor .milkdown :is(.top-bar-item, .toolbar-item).active {
     color: var(--accent);
