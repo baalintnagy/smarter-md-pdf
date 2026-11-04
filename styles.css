@@ -5,27 +5,29 @@
 }
 :root {
     color-scheme: light;
-    --bg: #dce4ef;
-    --surface: #f2f5fa;
-    --header: #eaf0f8cc;
-    --text: #25344c;
-    --muted: #718198;
-    --border: #dce4ef;
-    --accent: #3266a8;
-    --soft: #edf3fc;
-    --canvas: #d3deec;
-    --input: #eaf0f8;
-    --spotlight: rgb(50 102 168 / 13%);
-    --surface-light: rgb(111 155 210 / 8%);
+    --bg: #e2e3e8;
+    --surface: #f0f0f3;
+    --header: #f0f0f3dc;
+    --text: #0b1422;
+    --muted: #303c4d;
+    --border: #b8bdc8;
+    --accent: #1c385b;
+    --soft: #e9f0fa;
+    --canvas: #e7e7ec;
+    --input: #e7e7ec;
+    --spotlight: rgb(73 111 159 / 14%);
+    --surface-light: rgb(73 111 159 / 8%);
     --editor-bg: var(--input);
     --visual-editor-bg: var(--surface);
-    --hover-bg: #dce9fa;
-    --hover-glow: rgb(50 102 168 / 25%);
-    --hover-text: #234f85;
-    --brand-hover-text: #183e6d;
-    --brand-text-glow: rgb(50 102 168 / 35%);
-    --brand-symbol-glow: rgb(50 102 168 / 55%);
-    --brand-halo: rgb(50 102 168 / 18%);
+    --hover-bg: #e9f0fa;
+    --hover-glow: rgb(73 111 159 / 25%);
+    --hover-text: var(--accent);
+    --brand-text: #294b74;
+    --brand-mark-bg: #1c385b;
+    --brand-hover-text: #102e50;
+    --brand-text-glow: rgb(73 111 159 / 35%);
+    --brand-symbol-glow: rgb(73 111 159 / 55%);
+    --brand-halo: rgb(73 111 159 / 16%);
     --control-hover-shadow: 0 0 0 1px var(--accent), 0 3px 16px var(--hover-glow);
 }
 :root[data-theme='dark'] {
@@ -47,6 +49,8 @@
     --hover-bg: #263e5e;
     --hover-glow: rgb(154 183 229 / 35%);
     --hover-text: #d5e5ff;
+    --brand-text: var(--text);
+    --brand-mark-bg: #3266a8;
     --brand-hover-text: #fff;
     --brand-text-glow: rgb(255 255 255 / 65%);
     --brand-symbol-glow: rgb(255 255 255 / 80%);
@@ -142,7 +146,7 @@ button:disabled {
 }
 .brand {
     text-decoration: none;
-    color: var(--text);
+    color: var(--brand-text);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -156,7 +160,7 @@ button:disabled {
     height: 38px;
     display: grid;
     place-items: center;
-    background: #3266a8;
+    background: var(--brand-mark-bg);
     color: white;
     border-radius: 10px;
     font-size: 23px;
